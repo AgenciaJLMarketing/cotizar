@@ -264,6 +264,13 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
 .sign{display:flex;flex-direction:column;gap:6px}
 .sign .line{display:block;height:40px;border-bottom:1.5px solid #161616}
 .sign .lb{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#5B6275}
+.pdfing .paper{border-radius:0;box-shadow:none;border:0}
+.pdfing .pp-body{display:block}
+.pdfing .pp-body > *{margin-bottom:28px}
+.pdfing .pp-svc{display:block;font-size:0}
+.pdfing .pp-card{display:inline-block;vertical-align:top;width:calc(50% - 7px);margin:0 14px 14px 0;font-size:15px}
+.pdfing .pp-card:nth-child(2n){margin-right:0}
+.pdfing .pp-steps{grid-template-columns:repeat(4,minmax(0,1fr))}
 .pp-foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid #E6E9F2;padding-top:18px;font-size:12px;color:#5B6275}
 .pp-foot img{height:22px}
 .print-note{font-size:12px;color:var(--muted)}
@@ -1031,10 +1038,11 @@ if(framed){
   $("printBtn").hidden = true; $("pptBtn").hidden = true;
   $("printNote").textContent = "Para descargar en PDF o PowerPoint, abre la versión publicada en GitHub.";
 } else {
-  $("printNote").textContent = "En el diálogo elige “Guardar como PDF”.";
-  $("printBtn").addEventListener("click", ()=>{
-    const old = document.title; document.title = `Propuesta JL Marketing - ${S.client.empresa||"Cliente"}`;
-    window.print(); setTimeout(()=>document.title=old, 500);
+  $("printBtn").addEventListener("click", async ()=>{
+    const b = $("printBtn"), old = b.textContent; b.disabled = true; b.textContent = "Generando…";
+    try{ await buildPDF(); toast("PDF descargado") }
+    catch(e){ console.error(e); toast("No se pudo generar el PDF. Revisa tu conexión.") }
+    finally{ b.disabled = false; b.textContent = old }
   });
 }
 
@@ -1044,6 +1052,29 @@ if(!framed) $("pptBtn").addEventListener("click", async ()=>{
   catch(e){ console.error(e); toast("No se pudo generar el PowerPoint. Revisa tu conexión.") }
   finally{ b.disabled = false; b.textContent = old }
 });
+
+/* ============ PDF directo (sin diálogo de impresión) ============ */
+function loadH2P(){
+  if(window.html2pdf) return Promise.resolve();
+  return new Promise((res,rej)=>{ const s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"; s.onload=res; s.onerror=rej; document.head.appendChild(s) });
+}
+function pdfWorker(){
+  const emp = S.client.empresa || "Cliente";
+  document.body.classList.add("pdfing");
+  return html2pdf().set({
+    margin:[10,10,10,10],
+    filename:`Propuesta JL Marketing - ${emp}.pdf`,
+    image:{type:"jpeg", quality:0.95},
+    html2canvas:{scale:2, useCORS:true, backgroundColor:"#ffffff", scrollX:0, scrollY:0},
+    jsPDF:{unit:"mm", format:"letter", orientation:"portrait"},
+    pagebreak:{mode:["css"], avoid:[".pp-cover",".pp-card",".pp-accept",".pp-pauta",".pp-steps",".tbl-wrap",".pp-sec:not(:has(.pp-svc)):not(:has(table))",".pp-foot"]}
+  }).from($("paper"));
+}
+async function buildPDF(){
+  await loadH2P(); if(document.fonts) await document.fonts.ready;
+  try{ await pdfWorker().save() } finally { document.body.classList.remove("pdfing") }
+}
 
 /* ============ POWERPOINT (estructura de la propuesta Holden, colores JL) ============ */
 function loadPptx(){
