@@ -147,13 +147,15 @@ table.costs tfoot td{padding-top:8px}
 .add-custom:hover{border-color:var(--accent);background:var(--accent-soft)}
 .ct{grid-column:2/-1;cursor:default;display:grid;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
 .ct-h{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.ct-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 16px}
-.ct-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px}
-.ct-row:last-child{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-.ct-f{display:grid;gap:4px;font-size:11.5px;font-weight:700;color:var(--muted);min-width:0}
-.ct-f input,.ct-f select{width:100%;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px;font:inherit;font-size:13px;font-weight:700;color:var(--fg)}
+.ct-line{display:grid;grid-template-columns:minmax(0,1.3fr) 84px minmax(0,1fr) 28px;gap:8px;align-items:center;max-width:560px}
+.ct-head span{font-size:11px;font-weight:700;color:var(--muted)}
+.ct-na{color:var(--muted);padding-left:10px}
+.ct-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
+.ct-g{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-size:12px;font-weight:700;color:var(--muted)}
+.ct-g input{width:84px}
+.ct-line input,.ct-line select,.ct-g input{width:100%;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px;font:inherit;font-size:13px;font-weight:700;color:var(--fg)}
 .ct-note{font-size:11.5px;color:var(--muted)}
-@media (max-width:560px){.ct{grid-column:1/-1}}
+@media (max-width:560px){.ct{grid-column:1/-1}.ct-head{display:none}.ct-line{grid-template-columns:72px minmax(0,1fr) 24px;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--line)}.ct-line>select[data-ct="t"]{grid-column:1/3}.ct-line>.x{grid-column:3;grid-row:1}.ct-line>input{grid-column:1}.ct-line>select[data-ct="f"],.ct-line>.ct-na{grid-column:2}}
 .item-extra{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;cursor:default}
 .item:not(.on) .item-extra{display:none}
 .stepper{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface);overflow:hidden}
@@ -623,11 +625,11 @@ const K = (name, cost, qty=1, k) => ({name, cost, qty, ...(k?{k}:{})});
 const CATALOG = [
   {id:"plan-completo", cat:"redes", name:"Plan completo de redes y reels", desc:"Estrategia, 15 publicaciones, reels grabados, 8 historias, programación y reporte", freq:"mensual", unit:"mes", qty:1, fixedQty:true,
     costs:[K("Reels (grabación y edición)",800,4,"reels"),K("Community manager",1000),K("Directora de cuenta",1500),K("Gastos administrativos",1500)], fee:7000, minFee:7000, mode:"fixed",
-    content:{lead:"Estrategia", posts:15, postType:"mixto", stories:8, storyType:"mixto", reelsG:4, reelsE:0},
+    content:{lead:"Estrategia", items:[{t:"post",n:15,f:"mixto"},{t:"historia",n:8,f:"mixto"}], reelsG:4},
     inc:["Estrategia y matriz mensual de contenido","@content","Publicación y programación del contenido","Propuestas en tendencia y crecimiento orgánico","Reporte mensual de resultados"]},
   {id:"plan-esencial", cat:"redes", name:"Plan esencial de redes", desc:"12 publicaciones y 8 historias al mes, sin grabación de reels", freq:"mensual", unit:"mes", qty:1, fixedQty:true,
     costs:[K("Community manager",1000),K("Diseñador",1200),K("Directora de cuenta",800),K("Gastos administrativos",500)], fee:3500, mode:"fixed",
-    content:{lead:"Estrategia", posts:12, postType:"mixto", stories:8, storyType:"mixto", reelsG:0, reelsE:0},
+    content:{lead:"Estrategia", items:[{t:"post",n:12,f:"mixto"},{t:"historia",n:8,f:"mixto"}], reelsG:0},
     inc:["Matriz mensual de contenido","@content","Programación y respuesta básica","Reporte mensual de resultados"]},
   {id:"acompanamiento", cat:"redes", name:"Acompañamiento estratégico", desc:"Asesoría mensual, revisión de contenido y guiones. El cliente diseña y publica", freq:"mensual", unit:"mes", qty:1, fixedQty:true,
     costs:[K("Directora de cuenta",1500),K("Estratega / guionista",1000),K("Gastos administrativos",500)], fee:2000, mode:"fixed",
@@ -698,25 +700,29 @@ const allItems = () => CATALOG.concat((S && S.custom) || []);
 const item = id => allItems().find(i => i.id === id);
 const clone = o => JSON.parse(JSON.stringify(o));
 function newSel(it){ return {qty: it.qty || 1, costs: clone(it.costs), mode: it.mode || "pct", pct: it.pct ?? S0pct(), fee: it.fee ?? 0, ...(it.content?{content:clone(it.content)}:{})} }
-/* ---- Contenido de los planes de redes (publicaciones, historias, reels) ---- */
-const TIPOS = {mixto:"Mixto", estatica:"Estático", carrusel:"Carrusel"};
+/* ---- Contenido de los planes de redes: líneas de post / historia / reel creativo (trabajo de diseño) ---- */
+const CT_TIPOS = {post:"Post", historia:"Historia", reel:"Reel creativo"};
+const CT_FMT = {mixto:"Mixto", estatica:"Estático", carrusel:"Carrusel"};
 const plural = (n, a, b) => n===1 ? a : b;
 function contentOf(it, s){
   if(!it.content) return null;
-  const c = {...it.content, ...((s && s.content) || {})};
+  const sc = (s && s.content) || {};
+  const c = {...it.content, items: Array.isArray(sc.items) ? sc.items : clone(it.content.items)};
   const costs = (s && s.costs) || it.costs, r = costs.find(r=>r.k==="reels");
-  c.reelsG = r ? (+r.qty||0) : (+c.reelsG||0);
-  ["posts","stories","reelsE"].forEach(k=> c[k] = Math.max(0, +c[k]||0));
+  c.reelsG = r ? (+r.qty||0) : (+(sc.reelsG ?? c.reelsG)||0);
   return c;
 }
-function tipoTxt(t, n){ return t==="estatica" ? plural(n," estática"," estáticas") : t==="carrusel" ? " en carrusel" : "" }
+function fmtTxt(f, n){ return f==="estatica" ? plural(n," estática"," estáticas") : f==="carrusel" ? " en carrusel" : "" }
+function lineTxt(x, long){
+  const n = Math.max(0, +x.n||0); if(!n) return "";
+  if(x.t==="reel") return `${n} ${plural(n,"reel creativo","reels creativos")}${long?" al mes: diseño y edición":""}`;
+  const w = x.t==="historia" ? plural(n,"historia","historias") : plural(n,"publicación","publicaciones");
+  return `${n} ${w}${fmtTxt(x.f,n)}${long && x.f==="mixto" && x.t==="post" ? " (estáticas y carruseles)" : ""}${long?" al mes":""}`;
+}
 function contentParts(c, long){
-  const p = [];
-  if(c.posts) p.push(`${c.posts} ${plural(c.posts,"publicación","publicaciones")}${tipoTxt(c.postType,c.posts)}${long && c.postType==="mixto" ? " (estáticas y carruseles)" : ""}${long?" al mes":""}`);
-  if(c.reelsG) p.push(`${c.reelsG} ${plural(c.reelsG,"reel grabado","reels grabados")}${long?" al mes: guion, grabación y edición":""}`);
-  if(c.reelsE) p.push(`${c.reelsE} ${plural(c.reelsE,"reel","reels")} sin grabación${long?" al mes: edición con material del cliente o de banco":""}`);
-  if(c.stories) p.push(`${c.stories} ${plural(c.stories,"historia","historias")}${tipoTxt(c.storyType,c.stories)}${long?" al mes":""}`);
-  return p;
+  const of = t => c.items.filter(x=>x.t===t).map(x=>lineTxt(x,long)).filter(Boolean);
+  const g = c.reelsG ? [`${c.reelsG} ${plural(c.reelsG,"reel grabado","reels grabados")}${long?" al mes: guion, grabación y edición":""}`] : [];
+  return of("post").concat(of("reel"), g, of("historia"));
 }
 function descOf(it, s){
   const c = contentOf(it, s); if(!c) return it.desc;
@@ -724,14 +730,20 @@ function descOf(it, s){
 }
 function contentHTML(it, s){
   const c = contentOf(it, s), id = it.id;
-  const opt = v => Object.entries(TIPOS).map(([k,n])=>`<option value="${k}" ${v===k?"selected":""}>${n}</option>`).join("");
-  const num = (k,lbl) => `<label class="ct-f"><span>${lbl}</span><input id="ct-${id}-${k}" data-ct="${k}" class="num" type="number" min="0" inputmode="numeric" value="${c[k]}"></label>`;
+  const opts = (o,v) => Object.entries(o).map(([k,n])=>`<option value="${k}" ${v===k?"selected":""}>${n}</option>`).join("");
+  const rows = c.items.map((x,i)=>`<div class="ct-line">
+      <select data-ct="t" data-i="${i}" aria-label="Tipo de contenido">${opts(CT_TIPOS,x.t)}</select>
+      <input id="ct-${id}-${i}-n" data-ct="n" data-i="${i}" class="num" type="number" min="0" inputmode="numeric" value="${x.n}" aria-label="Cantidad al mes">
+      ${x.t==="reel" ? `<span class="ct-na">—</span>` : `<select data-ct="f" data-i="${i}" aria-label="Formato">${opts(CT_FMT,x.f||"mixto")}</select>`}
+      <button type="button" class="x" data-act="ct-del" data-i="${i}" aria-label="Quitar línea">×</button>
+    </div>`).join("");
   return `<div class="ct" data-stop>
-    <div class="ct-h">Contenido del mes</div>
-    <div class="ct-g">
-      <div class="ct-row">${num("posts","Publicaciones")}<label class="ct-f"><span>Tipo</span><select data-ct="postType" aria-label="Tipo de publicaciones">${opt(c.postType)}</select></label></div>
-      <div class="ct-row">${num("stories","Historias")}<label class="ct-f"><span>Tipo</span><select data-ct="storyType" aria-label="Tipo de historias">${opt(c.storyType)}</select></label></div>
-      <div class="ct-row">${num("reelsG","Reels grabados")}${num("reelsE","Reels sin grabación")}</div>
+    <div class="ct-h">Contenido del mes (diseño)</div>
+    <div class="ct-line ct-head"><span>Tipo</span><span>Cantidad</span><span>Formato</span><span></span></div>
+    ${rows}
+    <div class="ct-foot">
+      <button type="button" class="btn small" data-act="ct-add">+ Agregar línea</button>
+      <label class="ct-g">Reels grabados <input id="ct-${id}-rg" data-ct="reelsG" class="num" type="number" min="0" inputmode="numeric" value="${c.reelsG}" aria-label="Reels grabados"></label>
     </div>
     <small class="ct-note">Los reels grabados suman su costo de producción (editable en “Editar costos”). La descripción y la propuesta se actualizan solas.</small>
   </div>`;
@@ -1116,6 +1128,13 @@ $("catalog").addEventListener("click", e=>{
   if(act){
     const a = act.dataset.act;
     if(a==="edit") return openEditor(id);
+    if(a==="ct-add" || a==="ct-del"){
+      const c = contentOf(it, s); s.content = {items: c.items, reelsG: c.reelsG};
+      if(a==="ct-add"){ s.content.items.push({t:"post", n:1, f:"estatica"}) } else s.content.items.splice(+act.dataset.i, 1);
+      refreshItem(id); touch();
+      if(a==="ct-add"){ const f=$(`ct-${id}-${s.content.items.length-1}-n`); if(f){ f.focus(); f.select() } }
+      return;
+    }
     if(a==="add"){ s.costs.push({name:"Nuevo costo", cost:0, qty:1}); refreshItem(id); touch(); const f=$(`ec-${id}-${s.costs.length-1}-n`); if(f){f.focus();f.select()} return }
     if(a==="del"){ s.costs.splice(+act.dataset.row,1); refreshItem(id); touch(); return }
     if(a==="min"){ if(it.minFee != null){ s.mode="fixed"; s.fee=it.minFee } else { s.mode="pct"; s.pct=+S.cfg.minPct||0 } refreshItem(id); touch(); toast("Ganancia ajustada al mínimo"); return }
@@ -1133,18 +1152,19 @@ function onEdit(e, commit){
   const el = e.target.closest(".item"); if(!el) return; const id = el.dataset.id, s = S.sel[id]; if(!s) return;
   const t = e.target, v = t.value;
   if(t.dataset.ct){
-    const it = item(id), k = t.dataset.ct;
-    s.content = {...clone(it.content), ...(s.content||{})};
-    if(k==="postType" || k==="storyType") s.content[k] = v;
-    else {
-      const n = Math.max(0, Math.round(+v || 0));
+    const it = item(id), k = t.dataset.ct, c = contentOf(it, s);
+    s.content = {items: c.items, reelsG: c.reelsG};
+    if(k==="reelsG"){
       if(!commit && v==="") return;
-      s.content[k] = n;
-      if(k==="reelsG"){
-        s.costs = s.costs || clone(it.costs);
-        const r = s.costs.find(r=>r.k==="reels");
-        if(r) r.qty = n; else if(n) s.costs.unshift(K("Reels (grabación y edición)",800,n,"reels"));
-      }
+      const n = Math.max(0, Math.round(+v || 0)); s.content.reelsG = n;
+      s.costs = s.costs || clone(it.costs);
+      const r = s.costs.find(r=>r.k==="reels");
+      if(r) r.qty = n; else if(n) s.costs.unshift(K("Reels (grabación y edición)",800,n,"reels"));
+    } else {
+      const x = s.content.items[+t.dataset.i]; if(!x) return;
+      if(k==="n"){ if(!commit && v==="") return; x.n = Math.max(0, Math.round(+v || 0)) }
+      else { x[k] = v; if(k==="t" && v!=="reel" && !x.f) x.f = "mixto" }
+      if(k==="t") commit = true;
     }
     const d = $(`ds-${id}`); if(d) d.textContent = descOf(it, s);
     if(!commit){ liveUpdate(id); save(); renderSummary(); return }
