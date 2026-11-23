@@ -616,23 +616,23 @@ const CATALOG = [
     costs:[K("Reels (grabación y edición)",800,4,"reels"),K("Community manager",1000),K("Directora de cuenta",1500),K("Gastos administrativos",1500)], fee:7000, minFee:7000, mode:"fixed",
     inc:["Estrategia y matriz mensual de contenido","15 publicaciones al mes (carruseles, posts, tips, casos)","{reels} reels grabados al mes: guion, grabación y edición","8 historias al mes","Publicación y programación del contenido","Propuestas en tendencia y crecimiento orgánico","Reporte mensual de resultados"]},
   {id:"plan-esencial", cat:"redes", name:"Plan esencial de redes", desc:"12 publicaciones y 8 historias al mes, sin grabación de reels", freq:"mensual", unit:"mes", qty:1, fixedQty:true,
-    costs:[K("Community manager",1000),K("Diseñador",1200),K("Directora de cuenta",800),K("Gastos administrativos",500)], pct:30,
+    costs:[K("Community manager",1000),K("Diseñador",1200),K("Directora de cuenta",800),K("Gastos administrativos",500)], fee:3500, mode:"fixed",
     inc:["Matriz mensual de contenido","12 publicaciones al mes con diseño","8 historias al mes","Programación y respuesta básica","Reporte mensual de resultados"]},
   {id:"acompanamiento", cat:"redes", name:"Acompañamiento estratégico", desc:"Asesoría mensual, revisión de contenido y guiones. El cliente diseña y publica", freq:"mensual", unit:"mes", qty:1, fixedQty:true,
-    costs:[K("Directora de cuenta",1500),K("Estratega / guionista",1000),K("Gastos administrativos",500)], pct:30,
+    costs:[K("Directora de cuenta",1500),K("Estratega / guionista",1000),K("Gastos administrativos",500)], fee:2000, mode:"fixed",
     inc:["Asesoría estratégica mensual al equipo","Revisión de contenido antes de publicar","Guiones para videos","No incluye diseño, grabación ni publicación"]},
   {id:"post-extra", cat:"redes", name:"Publicaciones adicionales", desc:"Post o carrusel extra al plan contratado", freq:"mensual", unit:"publicación", qty:4,
     costs:[K("Diseño y copy",100)], pct:30,
     inc:["Diseño y copy de cada publicación","Programación en las redes definidas"]},
 
   {id:"reel", cat:"video", name:"Reel / video corto", desc:"Guion, grabación y edición profesional. Precio por video", freq:"unico", unit:"video", qty:1,
-    costs:[K("Proveedor de video",800)], fee:1300, mode:"fixed",
+    costs:[K("Proveedor de video",800)], fee:500, mode:"fixed",
     inc:["Guion","Grabación en locación","Edición profesional con música y textos"]},
   {id:"foto", cat:"video", name:"Sesión fotográfica", desc:"Media jornada de producto o equipo, 20 fotos editadas", freq:"unico", unit:"sesión", qty:1,
     costs:[K("Fotógrafo",1500)], pct:30,
     inc:["Media jornada de producción","20 fotografías editadas","Entrega digital en alta resolución"]},
   {id:"video-inst", cat:"video", name:"Video institucional", desc:"Hasta 2 minutos, con guion, locución y edición", freq:"unico", unit:"video", qty:1,
-    costs:[K("Productora de video",3500),K("Locución y música",1000)], pct:30,
+    costs:[K("Productora de video",3000)], fee:1000, mode:"fixed",
     inc:["Guion y plan de rodaje","Jornada de grabación","Locución y musicalización","Edición y 2 rondas de cambios"]},
 
   {id:"concepto", cat:"creativo", name:"Concepto creativo (dirección creativa)", desc:"3 propuestas de campaña con racional y data, y presentación de 1 hora", freq:"unico", unit:"proyecto", qty:1, fixedQty:true,
@@ -646,14 +646,14 @@ const CATALOG = [
     costs:[K("Analista",3500)], pct:30,
     inc:["Análisis de 5 competidores","Redes, contenido, tono y pauta visible","Oportunidades y recomendaciones","Presentación de resultados"]},
   {id:"estudio-campo", cat:"estudio", name:"Estudio de mercado con encuestas", desc:"Encuesta a público objetivo (hasta 300 respuestas) e informe", freq:"unico", unit:"estudio", qty:1, fixedQty:true,
-    costs:[K("Levantamiento de encuestas",6000),K("Analista",2000)], pct:30,
+    costs:[K("Estudio de mercado (proveedor)",30000)], fee:8000, minFee:8000, mode:"fixed",
     inc:["Diseño del cuestionario","Levantamiento de hasta 300 encuestas","Análisis e informe de hallazgos","Presentación de resultados"]},
 
   {id:"crm-setup", cat:"crm", name:"Implementación de CRM", desc:"Configuración de pipeline, formularios e integraciones", freq:"unico", unit:"proyecto", qty:1, fixedQty:true,
     costs:[K("Implementador CRM",5000)], pct:30,
     inc:["Configuración de pipeline de ventas","Formularios y captación de leads","Integración con redes y WhatsApp","Capacitación de uso al equipo","Licencias del CRM no incluidas"]},
   {id:"crm-admin", cat:"crm", name:"Administración de CRM", desc:"Mantenimiento, automatizaciones y reporte mensual", freq:"mensual", unit:"mes", qty:1, fixedQty:true,
-    costs:[K("Operador CRM",2000)], pct:30,
+    costs:[K("Operador CRM",2000)], fee:800, mode:"fixed",
     inc:["Mantenimiento de la base y el pipeline","Automatizaciones y correos","Reporte mensual de leads y conversión"]},
 
   {id:"asesoria", cat:"asesoria", name:"Asesoría estratégica", desc:"Sesiones con dirección de JL Marketing, por hora", freq:"unico", unit:"hora", qty:4,
@@ -675,7 +675,7 @@ const CATALOG = [
     inc:["Diseño del flujo conversacional","Configuración e integración","Pruebas y ajustes","Costo de la plataforma no incluido"]},
 
   {id:"influencer", cat:"influ", name:"Campaña con influencer", desc:"Selección, negociación y seguimiento. Honorario estimado incluido", freq:"unico", unit:"colaboración", qty:1,
-    costs:[K("Honorario del influencer",2500)], pct:30,
+    costs:[K("Honorario del influencer",700)], fee:1100, mode:"fixed",
     inc:["Búsqueda y selección del perfil","Negociación y brief","Seguimiento y reporte de resultados","Honorario del influencer según tarifa real"]}
 ];
 CATS.push({id:"otros", name:"Servicios personalizados", c:"#9AA3B8"});
@@ -691,7 +691,7 @@ function S0pct(){ return (S && S.cfg && +S.cfg.minPct) || 30 }
 const DEFAULTS = {admin:0, adminFreq:"once", iva:12, timbre:0.05, minPct:30, currency:"GTQ", rate:7.4};
 
 /* ============ ESTADO ============ */
-const KEY = "jl-cotizador-v4";
+const KEY = "jl-cotizador-v5";
 const today = new Date().toISOString().slice(0,10);
 function fresh(){
   return {client:{empresa:"",contacto:"",asesor:"",fecha:today,vigencia:"30",objetivos:"",notas:"",pago:"Los servicios mensuales se pagan dentro de los primeros 5 días de cada mes.",logo:""},
