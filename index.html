@@ -299,11 +299,11 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
       <button class="btn small ghost-dark" id="resetNo">Cancelar</button>
     </div>
     <h1>Cotiza en minutos, <em>con números claros.</em></h1>
-    <p>Llena los datos de la empresa, elige los servicios y la propuesta se arma sola con precios de agencia, costos administrativos e impuestos. La pauta se presenta aparte.</p>
+    <p>Llena los datos de la empresa, elige los servicios y la propuesta se arma sola con precios de agencia, impuestos. La pauta se presenta aparte.</p>
     <div class="chips">
       <span class="chip">Precios en <b id="curChip">Quetzales</b></span>
       <span class="chip">Todo <b>+ IVA <span id="ivaChip">12</span>%</b> y timbre de prensa</span>
-      <span class="chip">Costos administrativos <b id="adminChip">Q1,000</b></span>
+      <span class="chip" id="adminChipWrap" hidden>Costos administrativos <b id="adminChip">Q0</b></span>
       <span class="chip">Pauta <b>se factura aparte</b></span>
     </div>
   </div>
@@ -390,7 +390,7 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
           <div class="rows num">
             <div><span class="lbl">Servicios mensuales</span><span id="sMensual">Q0</span></div>
             <div><span class="lbl">Pagos únicos</span><span id="sUnico">Q0</span></div>
-            <div><span class="lbl">Costos administrativos</span><span id="sAdmin">Q0</span></div>
+            <div id="sAdminRow" hidden><span class="lbl">Costos administrativos</span><span id="sAdmin">Q0</span></div>
             <div><span class="lbl">IVA (<span id="sIvaPct">12</span>%)</span><span id="sIva">Q0</span></div>
             <div><span class="lbl">Timbre de prensa (<span id="sTimPct">0.05</span>%)</span><span id="sTim">Q0</span></div>
           </div>
@@ -547,7 +547,7 @@ const item = id => allItems().find(i => i.id === id);
 const clone = o => JSON.parse(JSON.stringify(o));
 function newSel(it){ return {qty: it.qty || 1, costs: clone(it.costs), mode: it.mode || "pct", pct: it.pct ?? S0pct(), fee: it.fee ?? 0} }
 function S0pct(){ return (S && S.cfg && +S.cfg.minPct) || 30 }
-const DEFAULTS = {admin:1000, adminFreq:"once", iva:12, timbre:0.05, minPct:30, currency:"GTQ", rate:7.4};
+const DEFAULTS = {admin:0, adminFreq:"once", iva:12, timbre:0.05, minPct:30, currency:"GTQ", rate:7.4};
 
 /* ============ ESTADO ============ */
 const KEY = "jl-cotizador-v4";
@@ -569,6 +569,7 @@ function example(){
 try { S = JSON.parse(localStorage.getItem(KEY)) } catch(e) { S = null }
 if(!S || !S.client) S = example();
 S.cfg = {...DEFAULTS, ...(S.cfg||{})};
+if(!S.cfg.adminV2){ S.cfg.admin = 0; S.cfg.adminV2 = true } /* los administrativos ya van dentro de cada servicio */
 S.custom = S.custom || [];
 if(S.client.pago == null) S.client.pago = "Los servicios mensuales se pagan dentro de los primeros 5 días de cada mes.";
 S.pauta = {...fresh().pauta, ...(S.pauta||{})}; if(!Array.isArray(S.pauta.redes)) S.pauta.redes = [];
@@ -746,7 +747,7 @@ function renderSummary(){
   $("sIva").textContent = fmt(r.iva1);
   $("sTimPct").textContent = S.cfg.timbre; $("sTim").textContent = fmtc(r.tim1);
   $("sTotal").textContent = fmt(r.total1);
-  $("sTotalSub").textContent = `Servicios + administrativos + IVA ${S.cfg.iva}% + timbre ${S.cfg.timbre}%`;
+  $("sTotalSub").textContent = `Servicios${r.admin?" + administrativos":""} + IVA ${S.cfg.iva}% + timbre ${S.cfg.timbre}%`;
   $("sRecurrente").textContent = fmt(r.rec);
   $("sContrato").textContent = r.indef ? `${fmt(r.rec)}/mes` : fmt(r.contrato);
   $("sContratoLbl").textContent = r.indef ? "Plazo indefinido, cada mes" : "Total del contrato con impuestos";
@@ -757,7 +758,7 @@ function renderSummary(){
   $("iProv").textContent = fmt(r.prov1);
   $("iFee").textContent = fmt(r.fee1);
   $("iMargen").textContent = r.base1 ? Math.round(r.fee1/r.base1*100)+"%" : "0%";
-  $("adminChip").textContent = fmt(+S.cfg.admin||0);
+  $("adminChip").textContent = fmt(+S.cfg.admin||0); $("adminChipWrap").hidden = !(+S.cfg.admin); $("sAdminRow").hidden = !r.admin;
   $("ivaChip").textContent = S.cfg.iva;
   renderPautaLive(r);
   renderCats();
