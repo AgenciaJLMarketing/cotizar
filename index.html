@@ -212,6 +212,9 @@ body.internal .internal-only.block{display:block !important}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--black);color:#fff;padding:10px 18px;border-radius:999px;font-weight:700;font-size:13px;opacity:0;transition:all .25s;pointer-events:none;z-index:20}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+.cur{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#22252D;border-radius:999px;padding:4px;margin-bottom:16px}
+.cur button{border:0;background:transparent;color:#A9B0C2;border-radius:999px;padding:7px 8px;font-weight:700;font-size:12px;cursor:pointer}
+.cur button[aria-pressed="true"]{background:var(--mint);color:var(--black)}
 /* Confirm */
 .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;margin-top:10px;color:#fff}
 
@@ -268,16 +271,17 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
 @media print{
   @page{size:letter;margin:12mm}
   body{background:#fff !important}
-  body > *:not(main), .hero, .grid, .proposal-wrap > .panel-head, .cur{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#22252D;border-radius:999px;padding:4px;margin-bottom:16px}
-.cur button{border:0;background:transparent;color:#A9B0C2;border-radius:999px;padding:7px 8px;font-weight:700;font-size:12px;cursor:pointer}
-.cur button[aria-pressed="true"]{background:var(--mint);color:var(--black)}
-.toast{display:none !important}
+  body > *:not(main), .hero, .grid, .proposal-wrap > .panel-head, .toast{display:none !important}
   main{padding:0}
   .wrap{padding:0;max-width:none}
   .proposal-wrap{margin:0}
   .paper{box-shadow:none;border:0;border-radius:0}
   .pp-cover,.big,table.inv tfoot tr.total td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .pp-pauta{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pp-sec:not(:has(.pp-svc)):not(:has(table)){break-inside:avoid;page-break-inside:avoid}
+  .pp-sec h3{break-after:avoid;page-break-after:avoid}
+  .pp-card, table.inv tr, table.inv tfoot{break-inside:avoid;page-break-inside:avoid}
+  .pp-body{gap:26px}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none !important}}
 </style>
