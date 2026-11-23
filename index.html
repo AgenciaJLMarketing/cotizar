@@ -166,7 +166,10 @@ body.internal .internal-only.block{display:block !important}
 .plat:hover{border-color:var(--accent)}
 .plat[aria-pressed="true"]{background:var(--electric);border-color:var(--electric);color:#fff}
 .pbox{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:12px;background:var(--surface-2)}
-.pbox.off .pauta{opacity:.5}
+.pbox.off .pauta,.pbox.off .psub{opacity:.5}
+.psub{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;border-top:1px solid var(--line);padding-top:12px}
+.psub b{font-size:14px}
+.psub span{font-size:12px;color:var(--muted)}
 .pbox .field input{background:var(--surface)}
 .pcheck{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
 .pcheck input{width:18px;height:18px;margin-top:2px;accent-color:var(--electric)}
@@ -323,7 +326,7 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
 .pd-compact .pd-steps li{font-size:11.5px}
 .pd-cont{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:22px;border-bottom:1px solid #E6E9F2;font-size:12px;color:#5B6275;font-weight:600}
 .pd-cont img{height:22px}
-.pd-foot{position:absolute;left:0;right:0;bottom:0;height:84px;background:#161616;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 64px;font-size:12px}
+.pd-foot{position:absolute;left:0;right:0;bottom:0;height:72px;background:#161616;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 64px;font-size:12px}
 .pd-foot img{height:24px}
 .pd-foot span{color:#A9B0C2}
 .pd-foot b{flex:1;text-align:center;color:#5DEBD3;font-size:19px;font-weight:800}
@@ -488,11 +491,19 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
           <div class="field"><span class="flabel">Plataformas</span><div class="plats" id="pRedes" role="group" aria-label="Plataformas de pauta"></div></div>
           <div class="field" style="margin-top:14px;max-width:320px"><label for="pMonto">Inversión mensual en pauta (Q) · aparte</label><input id="pMonto" type="number" min="0" step="500" placeholder="0" class="num"></div>
           <div class="pbox" id="pBox">
-            <label class="pcheck"><input type="checkbox" id="pGest"> <span><b>Incluir gestión de pauta</b><small>Monto fijo mensual, no depende de la inversión</small></span></label>
+            <label class="pcheck"><input type="checkbox" id="pGest"> <span><b>Incluir gestión de pauta</b><small>Montos fijos, no dependen de la inversión. El mes 1 incluye la configuración inicial.</small></span></label>
+            <div class="psub"><b>Mes 1</b><span>Configuración de plataformas, análisis y arranque</span></div>
             <div class="pauta">
-              <div class="field"><label for="pCost">Costo de gestión (Q)</label><input id="pCost" inputmode="numeric" class="num"></div>
-              <div class="field"><label for="pGain">Ganancia de la agencia (Q)</label><input id="pGain" inputmode="numeric" class="num"></div>
-              <div class="ed-kpi"><span>Precio al cliente / mes</span><b class="num" id="pPrice">Q0</b><small>+ IVA · <button type="button" class="linkbtn" id="pReset">Restablecer</button></small></div>
+              <div class="field"><label for="pCost1">Costo mes 1 (Q)</label><input id="pCost1" inputmode="numeric" class="num"></div>
+              <div class="field"><label for="pGain1">Ganancia mes 1 (Q)</label><input id="pGain1" inputmode="numeric" class="num"></div>
+              <div class="ed-kpi"><span>Precio mes 1</span><b class="num" id="pPrice1">Q0</b><small>+ IVA</small></div>
+            </div>
+            <div class="field"><label for="pInc1">Qué incluye el mes 1 (uno por línea)</label><textarea id="pInc1" style="min-height:92px"></textarea></div>
+            <div class="psub"><b>Mes 2 en adelante</b><span>Optimización continua y reporte mensual</span></div>
+            <div class="pauta">
+              <div class="field"><label for="pCost">Costo mensual (Q)</label><input id="pCost" inputmode="numeric" class="num"></div>
+              <div class="field"><label for="pGain">Ganancia mensual (Q)</label><input id="pGain" inputmode="numeric" class="num"></div>
+              <div class="ed-kpi"><span>Precio por mes</span><b class="num" id="pPrice">Q0</b><small>+ IVA · <button type="button" class="linkbtn" id="pReset">Restablecer</button></small></div>
             </div>
             <div class="ed-warn" id="pWarn" hidden><span id="pWarnT"></span> <button type="button" class="btn small" id="pMin">Subir al mínimo</button></div>
           </div>
@@ -668,7 +679,8 @@ const CATALOG = [
     inc:["Búsqueda y selección del perfil","Negociación y brief","Seguimiento y reporte de resultados","Honorario del influencer según tarifa real"]}
 ];
 CATS.push({id:"otros", name:"Servicios personalizados", c:"#9AA3B8"});
-const PAUTA = {cost:6000, fee:2000};
+const PAUTA = {cost:6000, fee:2000, cost1:7500, fee1:2000, inc1:"Configuración de cuentas publicitarias y plataformas\nInstalación de píxeles y medición de conversiones\nAnálisis de audiencia, competencia e históricos\nEstructura de campañas, segmentaciones y anuncios iniciales"};
+const PAUTA_REC = ["Optimización continua de campañas","Ajustes de presupuesto y segmentación","Reporte mensual de resultados"];
 const PLATAFORMAS = ["Facebook","Instagram","LinkedIn","TikTok","Google","ChatGPT"];
 let S; /* estado, se carga abajo */
 const allItems = () => CATALOG.concat((S && S.custom) || []);
@@ -683,7 +695,7 @@ const KEY = "jl-cotizador-v4";
 const today = new Date().toISOString().slice(0,10);
 function fresh(){
   return {client:{empresa:"",contacto:"",asesor:"",fecha:today,vigencia:"30",objetivos:"",notas:"",pago:"Los servicios mensuales se pagan dentro de los primeros 5 días de cada mes.",logo:""},
-    sel:{}, custom:[], open:null, meses:"12", pauta:{monto:"",redes:[],gestion:false,cost:PAUTA.cost,fee:PAUTA.fee}, cfg:{...DEFAULTS}, cat:"all", internal:false};
+    sel:{}, custom:[], open:null, meses:"12", pauta:{monto:"",redes:[],gestion:false,cost:PAUTA.cost,fee:PAUTA.fee,cost1:PAUTA.cost1,fee1:PAUTA.fee1,inc1:PAUTA.inc1}, cfg:{...DEFAULTS}, cat:"all", internal:false};
 }
 function example(){
   const s = fresh();
@@ -741,7 +753,10 @@ function calc(){
   const pautaMonto = Math.max(0, +S.pauta.monto || 0);
   const pautaCost = S.pauta.gestion ? (+S.pauta.cost || 0) : 0;
   const pautaGain = S.pauta.gestion ? (+S.pauta.fee || 0) : 0;
-  const pautaFee = pautaCost + pautaGain; /* precio de la gestión de pauta al cliente */
+  const pautaFee = pautaCost + pautaGain; /* gestión de pauta desde el mes 2 */
+  const pautaCost1 = S.pauta.gestion ? (+S.pauta.cost1 || 0) : 0;
+  const pautaGain1 = S.pauta.gestion ? (+S.pauta.fee1 || 0) : 0;
+  const pauta1 = pautaCost1 + pautaGain1; /* mes 1: configuración y análisis */
   const mensual = sum(m,"total") + pautaFee;
   const unico = sum(u,"total");
   const admin = (lines.length || pautaFee) ? (+S.cfg.admin || 0) : 0;
@@ -750,12 +765,12 @@ function calc(){
   const indef = S.meses === "0";
   const meses = indef ? 0 : (+S.meses || 1);
   const tim = (+S.cfg.timbre || 0)/100, mult = 1 + iva + tim;
-  const base1 = mensual + unico + admin;
+  const base1 = mensual - pautaFee + pauta1 + unico + admin;
   const baseRec = mensual + (adminMonthly ? admin : 0);
-  const baseContrato = mensual*meses + unico + (adminMonthly ? admin*meses : admin);
-  const prov1 = sum(lines,"totalProv") + pautaCost;
-  const fee1 = sum(lines,"totalFee") + pautaGain + admin;
-  return {lines, m, u, mensual, unico, admin, adminMonthly, pautaMonto, pautaFee, pautaCost, pautaGain, iva, meses,
+  const baseContrato = mensual*meses + (pauta1 - pautaFee) + unico + (adminMonthly ? admin*meses : admin);
+  const prov1 = sum(lines,"totalProv") + pautaCost1;
+  const fee1 = sum(lines,"totalFee") + pautaGain1 + admin;
+  return {lines, m, u, mensual, unico, admin, adminMonthly, pautaMonto, pautaFee, pautaCost, pautaGain, pauta1, iva, meses,
     base1, iva1: base1*iva, tim1: base1*tim, total1: base1*mult, indef,
     rec: baseRec*mult, contrato: indef ? null : baseContrato*mult, prov1, fee1};
 }
@@ -867,7 +882,7 @@ function renderSummary(){
   $("sName").textContent = S.client.empresa || "Empresa sin nombre";
   $("sSub").textContent = (S.example ? "Ejemplo · " : "") + (S.client.contacto || "Cotización");
   const li = r.lines.map(l=>`<li><span>${esc(l.name)}${l.qty>1?` ×${l.qty}`:""}</span><span class="num">${fmt(l.total)}${l.freq==="mensual"?"/m":""}</span></li>`);
-  if(r.pautaFee) li.push(`<li><span>Gestión de pauta</span><span class="num">${fmt(r.pautaFee)}/m</span></li>`);
+  if(r.pauta1 || r.pautaFee){ li.push(`<li><span>Gestión de pauta · mes 1</span><span class="num">${fmt(r.pauta1)}</span></li>`); li.push(`<li><span>Gestión de pauta · mes 2 en adelante</span><span class="num">${fmt(r.pautaFee)}/m</span></li>`) }
   $("sList").innerHTML = li.length ? li.join("") : `<li class="empty">Elige servicios del catálogo</li>`;
   $("sMensual").textContent = fmt(r.mensual);
   $("sUnico").textContent = fmt(r.unico);
@@ -907,12 +922,16 @@ function renderPaper(r){
   const c = S.client, emp = c.empresa || "su empresa";
   const objetivos = (c.objetivos||"").split("\n").map(s=>s.trim()).filter(Boolean);
   const clLogo = c.logo ? `<img src="${c.logo}" alt="${esc(emp)}">` : `<span>${esc(c.empresa||"Logo cliente")}</span>`;
-  const svc = r.lines.map(l=>`<div class="pp-card"><div class="t">${esc(l.name)}${l.qty>1?` · ${l.qty} ${l.it.unit}${/[aeiou]$/.test(l.it.unit)?"s":"es"}`:""}</div>
+  const pautaCard = (r.pauta1 || r.pautaFee) ? `<div class="pp-card"><div class="t">Gestión de pauta</div><div class="s">Mes 1 · configuración inicial</div><ul>${pautaInc1().map(x=>`<li>${esc(x)}</li>`).join("")}</ul><div class="s" style="margin-top:8px">Mes 2 en adelante</div><ul>${PAUTA_REC.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
+  const svc = pautaCard + r.lines.map(l=>`<div class="pp-card"><div class="t">${esc(l.name)}${l.qty>1?` · ${l.qty} ${l.it.unit}${/[aeiou]$/.test(l.it.unit)?"s":"es"}`:""}</div>
       <div class="s">${l.freq==="mensual"?"Servicio mensual":"Pago único"}</div>
       <ul>${l.inc.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("");
   const rows = r.lines.map(l=>`<tr><td><b>${esc(l.name)}</b>${l.qty>1?`<br><span style="color:#5B6275">${l.qty} × ${fmt(l.unitPrice)} por ${l.it.unit}</span>`:""}</td>
       <td>${l.freq==="mensual"?"Mensual":"Pago único"}</td><td class="r num">${fmt(l.total)}</td></tr>`);
-  if(r.pautaFee) rows.push(`<tr><td><b>Gestión de pauta</b><br><span style="color:#5B6275">Estrategia, configuración, optimización y reporte de campañas${S.pauta.redes.length?` en ${esc(redesTxt())}`:""}</span></td><td>Mensual</td><td class="r num">${fmt(r.pautaFee)}</td></tr>`);
+  if(r.pauta1 || r.pautaFee){
+    rows.push(`<tr><td><b>Gestión de pauta · mes 1</b><br><span style="color:#5B6275">Configuración de plataformas, análisis y estructura de campañas${S.pauta.redes.length?` en ${esc(redesTxt())}`:""}</span></td><td>Mes 1</td><td class="r num">${fmt(r.pauta1)}</td></tr>`);
+    rows.push(`<tr><td><b>Gestión de pauta · mes 2 en adelante</b><br><span style="color:#5B6275">Optimización continua y reporte mensual</span></td><td>Mensual</td><td class="r num">${fmt(r.pautaFee)}</td></tr>`);
+  }
   if(r.admin) rows.push(`<tr><td><b>Costos administrativos</b></td><td>${r.adminMonthly?"Mensual":"Pago único"}</td><td class="r num">${fmt(r.admin)}</td></tr>`);
   const venc = (()=>{ if(!c.fecha) return ""; const d=new Date(c.fecha+"T12:00:00"); d.setDate(d.getDate()+(+c.vigencia||30)); return fechaLarga(d.toISOString().slice(0,10)) })();
 
@@ -966,7 +985,7 @@ function renderPaper(r){
 const fieldMap = {fEmpresa:"empresa",fContacto:"contacto",fAsesor:"asesor",fFecha:"fecha",fVigencia:"vigencia",fObjetivos:"objetivos",fNotas:"notas",fPago:"pago"};
 function loadForm(){
   for(const [id,k] of Object.entries(fieldMap)) $(id).value = S.client[k] || "";
-  $("fMeses").value = S.meses; $("pMonto").value = S.pauta.monto; $("pGest").checked = !!S.pauta.gestion; $("pCost").value = S.pauta.cost; $("pGain").value = S.pauta.fee; renderPlataformas();
+  $("fMeses").value = S.meses; $("pMonto").value = S.pauta.monto; $("pGest").checked = !!S.pauta.gestion; $("pCost").value = S.pauta.cost; $("pGain").value = S.pauta.fee; $("pCost1").value = S.pauta.cost1; $("pGain1").value = S.pauta.fee1; $("pInc1").value = S.pauta.inc1; renderPlataformas();
   $("cAdmin").value = S.cfg.admin; $("cAdminFreq").value = S.cfg.adminFreq; $("cIva").value = S.cfg.iva; $("cTimbre").value = S.cfg.timbre; $("cRate").value = S.cfg.rate; renderCur(); $("cMinPct").value = S.cfg.minPct;
   showLogo();
   document.body.classList.toggle("internal", !!S.internal);
@@ -988,9 +1007,15 @@ $("pRedes").addEventListener("click", e=>{
 $("pGest").addEventListener("change", e=>{ S.pauta.gestion=e.target.checked; touch() });
 $("pCost").addEventListener("input", e=>{ S.pauta.cost=Math.max(0,+e.target.value||0); touch() });
 $("pGain").addEventListener("input", e=>{ S.pauta.fee=Math.max(0,+e.target.value||0); touch() });
-$("pReset").addEventListener("click", ()=>{ S.pauta.cost=PAUTA.cost; S.pauta.fee=PAUTA.fee; $("pCost").value=PAUTA.cost; $("pGain").value=PAUTA.fee; touch() });
+$("pCost1").addEventListener("input", e=>{ S.pauta.cost1=Math.max(0,+e.target.value||0); touch() });
+$("pGain1").addEventListener("input", e=>{ S.pauta.fee1=Math.max(0,+e.target.value||0); touch() });
+$("pInc1").addEventListener("input", e=>{ S.pauta.inc1=e.target.value; touch() });
+$("pReset").addEventListener("click", ()=>{ Object.assign(S.pauta,{cost:PAUTA.cost,fee:PAUTA.fee,cost1:PAUTA.cost1,fee1:PAUTA.fee1,inc1:PAUTA.inc1});
+  $("pCost").value=PAUTA.cost; $("pGain").value=PAUTA.fee; $("pCost1").value=PAUTA.cost1; $("pGain1").value=PAUTA.fee1; $("pInc1").value=PAUTA.inc1; touch() });
+function pautaInc1(){ return (S.pauta.inc1||"").split("\n").map(x=>x.trim()).filter(Boolean) }
 function renderPautaLive(r){
   $("pPrice").textContent = fmtQ((+S.pauta.cost||0)+(+S.pauta.fee||0));
+  $("pPrice1").textContent = fmtQ((+S.pauta.cost1||0)+(+S.pauta.fee1||0));
   $("pBox").classList.toggle("off", !S.pauta.gestion);
   const pMinFee = (+S.pauta.cost||0)*(+S.cfg.minPct||0)/100;
   const below = (+S.pauta.fee||0) < pMinFee - 0.005;
@@ -1145,7 +1170,7 @@ function summaryText(){
   const r = calc(), c = S.client;
   const L = [`Propuesta JL Marketing – ${c.empresa||"Cliente"}`, fechaLarga(c.fecha), ""];
   r.lines.forEach(l=>L.push(`• ${l.name}${l.qty>1?` (${l.qty} ${l.it.unit})`:""}: ${fmt(l.total)}${l.freq==="mensual"?" /mes":" pago único"}`));
-  if(r.pautaFee) L.push(`• Gestión de pauta: ${fmt(r.pautaFee)} /mes`);
+  if(r.pauta1 || r.pautaFee) L.push(`• Gestión de pauta: mes 1 ${fmt(r.pauta1)} · mes 2 en adelante ${fmt(r.pautaFee)} /mes`);
   if(r.admin) L.push(`• Costos administrativos: ${fmt(r.admin)}`);
   L.push("", `Subtotal primer mes: ${fmt(r.base1)}`, `IVA ${S.cfg.iva}%: ${fmt(r.iva1)}`, `Timbre de prensa ${S.cfg.timbre}%: ${fmtc(r.tim1)}`, `Inversión primer mes: ${fmt(r.total1)}`);
   if(r.mensual) L.push(`Mes 2 en adelante: ${fmt(r.rec)} /mes`, `Vigencia del contrato: ${vigenciaTxt(r)}`);
@@ -1198,7 +1223,10 @@ function pdfBlocks(r){
   B.push({html:`<div class="pd-meta">${meta.map(([k,v])=>`<div><span>${k}</span><b>${esc(v)}</b></div>`).join("")}</div>`});
   if(objetivos.length) B.push({html:`<div class="pd-t">Objetivos</div><ul class="pd-ul">${objetivos.map(o=>`<li>${esc(o)}</li>`).join("")}</ul>`});
   const rows = r.lines.map(l=>[l.name + (l.qty>1?` · ${l.qty} × ${fmt(l.unitPrice)}`:""), l.freq==="mensual"?"Mensual":"Pago único", fmt(l.total)]);
-  if(r.pautaFee) rows.push(["Gestión de pauta" + (S.pauta.redes.length?` · ${redesTxt()}`:""), "Mensual", fmt(r.pautaFee)]);
+  if(r.pauta1 || r.pautaFee){
+    rows.push(["Gestión de pauta · mes 1 (configuración)" + (S.pauta.redes.length?` · ${redesTxt()}`:""), "Mes 1", fmt(r.pauta1)]);
+    rows.push(["Gestión de pauta · mes 2 en adelante", "Mensual", fmt(r.pautaFee)]);
+  }
   if(r.admin) rows.push(["Costos administrativos", r.adminMonthly?"Mensual":"Pago único", fmt(r.admin)]);
   const rowHTML = x => `<table class="pd-tb">${PD_COLS}<tbody><tr><td>${esc(x[0])}</td><td>${x[1]}</td><td class="r">${x[2]}</td></tr></tbody></table>`;
   if(!rows.length) rows.push(["Sin servicios","",""]);
@@ -1213,7 +1241,7 @@ function pdfBlocks(r){
     </div><p class="pd-note">${curNote()} La producción de videos adicionales a los incluidos en cada plan se cotiza aparte.</p>`});
   if(r.pautaMonto) B.push({html:`<div class="pd-box"><b>Pauta digital:</b> inversión sugerida de <b>${fmt(r.pautaMonto)} al mes</b>${S.pauta.redes.length?` en ${esc(redesTxt())}`:""}. Este monto lo paga ${esc(emp)} directamente a las plataformas y no forma parte de la inversión de agencia.</div>`});
   if(c.notas) B.push({html:`<div class="pd-t">Notas</div><p class="pd-p">${esc(c.notas).replace(/\n/g,"<br>")}</p>`});
-  const cards = r.lines.map(l=>`<div class="pd-card"><b>${esc(l.name)}${l.qty>1?` · ${l.qty} ${esc(l.it.unit)}${/[aeiou]$/.test(l.it.unit)?"s":"es"}`:""}</b><small>${l.freq==="mensual"?"Servicio mensual":"Pago único"}</small><ul>${l.inc.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`);
+  const cards = ((r.pauta1 || r.pautaFee) ? [`<div class="pd-card"><b>Gestión de pauta</b><small>Mes 1 · configuración inicial</small><ul>${pautaInc1().map(x=>`<li>${esc(x)}</li>`).join("")}</ul><small style="margin-top:6px">Mes 2 en adelante</small><ul>${PAUTA_REC.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`] : []).concat(r.lines.map(l=>`<div class="pd-card"><b>${esc(l.name)}${l.qty>1?` · ${l.qty} ${esc(l.it.unit)}${/[aeiou]$/.test(l.it.unit)?"s":"es"}`:""}</b><small>${l.freq==="mensual"?"Servicio mensual":"Pago único"}</small><ul>${l.inc.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`));
   for(let i=0;i<cards.length;i+=2) B.push({html:`${i===0?`<div class="pd-t">Qué incluye cada servicio</div>`:""}<div class="pd-row">${cards.slice(i,i+2).join("")}</div>`});
   B.push({html:`${c.pago?`<div class="pd-t">Condiciones de pago</div><p class="pd-p">${esc(c.pago).replace(/\n/g,"<br>")}</p>`:""}
     <div class="pd-t" style="margin-top:18px">Próximos pasos</div><ol class="pd-steps"><li>Revisión de la propuesta con su equipo</li><li>Reunión para ajustar alcance</li><li>Inversión final y firma</li><li>Reunión de arranque</li></ol>`});
@@ -1230,7 +1258,7 @@ function pdfPaginate(box, r, compact){
   blocks.forEach((b,i)=>{ const nx = blocks[i+1]; b.h = b.el.getBoundingClientRect().height + parseFloat(getComputedStyle(b.el).marginBottom);
     if(b.tight && !(nx && nx.tight)) b.h += 18; delete b.el });
   meas.remove();
-  const AVAIL = 1056 - 8 - 40 - 84 - 22, CONT_HEAD = 50;
+  const AVAIL = 1056 - 8 - 40 - 72 - 18, CONT_HEAD = 50;
   const pages = [[]]; let used = 0;
   blocks.forEach((b,i)=>{ const room = AVAIL - (pages.length>1 ? CONT_HEAD : 0);
     /* los totales no se separan de la última fila de la tabla */
@@ -1246,6 +1274,7 @@ function pdfPaginate(box, r, compact){
     const mv = prev[prev.length-1];
     if(mv.kind === "row") break;
     if(usedOf(last) + mv.h > roomLast) break;
+    if(usedOf(prev) - mv.h < roomLast*0.5) break;
     prev.pop(); last.unshift(mv);
   }
   return pages;
@@ -1255,7 +1284,7 @@ function pdfPages(r){
   const box = document.createElement("div"); box.className = "pdfdoc"; box.style.cssText = "position:absolute;left:-12000px;top:0";
   document.body.appendChild(box);
   let pages = pdfPaginate(box, r, false);
-  if(pages.length > 1){ const alt = pdfPaginate(box, r, true); if(alt.length < pages.length) pages = alt; else box.classList.remove("pd-compact") }
+  if(pages.length > 1){ const alt = pdfPaginate(box, r, true); if(alt.length < pages.length || (alt.length === pages.length && alt[0].length > pages[0].length)) pages = alt; else box.classList.remove("pd-compact") }
   const N = pages.length;
   box.innerHTML = pages.map((pg,n)=>`<section class="pd-pg">
       <div class="pd-bar"></div>
@@ -1352,7 +1381,7 @@ async function buildPPT(){
 
   /* 3. Servicios (3 por lámina) */
   const items = r.lines.map(l=>({name:l.name+(l.qty>1?` (${l.qty})`:""), tipo:l.freq==="mensual"?"Servicio mensual":"Pago único", inc:l.inc, price:`${fmt(l.total)}${l.freq==="mensual"?" /mes":""}`}));
-  if(r.pautaFee) items.push({name:"Gestión de pauta", tipo:"Servicio mensual", inc:["Estrategia y configuración de campañas","Optimización continua","Reporte mensual"].concat(S.pauta.redes.length?[`Plataformas: ${redesTxt()}`]:[]), price:`${fmt(r.pautaFee)} /mes`});
+  if(r.pauta1 || r.pautaFee) items.unshift({name:"Gestión de pauta", tipo:"Mes 1 + mensual", inc:pautaInc1().map(x=>"Mes 1: "+x).concat(["Desde mes 2: optimización y reporte mensual"]).concat(S.pauta.redes.length?[`Plataformas: ${redesTxt()}`]:[]), price:`${fmt(r.pauta1)} mes 1 · ${fmt(r.pautaFee)}/mes`});
   for(let i=0;i<items.length;i+=3){
     s = pptx.addSlide(); header(s, i===0?"Servicios propuestos":"Servicios propuestos (cont.)", "Qué incluye la propuesta");
     items.slice(i,i+3).forEach((it,j)=>{ const x=0.7+j*4.03, w=3.83, y=1.9, h=4.85;
@@ -1372,7 +1401,7 @@ async function buildPPT(){
   const rows = [[{text:"SERVICIO",options:hdr},{text:"TIPO DE PAGO",options:hdr},{text:"INVERSIÓN",options:{...hdr,align:"right"}}]];
   const cell = (t,o={}) => ({text:t,options:{fontFace:F,fontSize:11,color:BLACK,fill:{color:WHITE},...o}});
   r.lines.forEach(l=>rows.push([cell(l.name+(l.qty>1?` (${l.qty} × ${fmt(l.unitPrice)})`:""),{bold:true}), cell(l.freq==="mensual"?"Mensual":"Pago único",{color:GREY}), cell(fmt(l.total),{align:"right",bold:true})]));
-  if(r.pautaFee) rows.push([cell("Gestión de pauta",{bold:true}),cell("Mensual",{color:GREY}),cell(fmt(r.pautaFee),{align:"right",bold:true})]);
+  if(r.pauta1 || r.pautaFee){ rows.push([cell("Gestión de pauta · mes 1 (configuración)",{bold:true}),cell("Mes 1",{color:GREY}),cell(fmt(r.pauta1),{align:"right",bold:true})]); rows.push([cell("Gestión de pauta · mes 2 en adelante",{bold:true}),cell("Mensual",{color:GREY}),cell(fmt(r.pautaFee),{align:"right",bold:true})]) }
   if(r.admin) rows.push([cell("Costos administrativos",{bold:true}),cell(r.adminMonthly?"Mensual":"Pago único",{color:GREY}),cell(fmt(r.admin),{align:"right",bold:true})]);
   s.addTable(rows,{x:0.7,y:1.9,w:7.7,colW:[4.3,1.7,1.7],border:{type:"solid",color:LINE,pt:0.75},rowH:0.42,autoPage:true,autoPageRepeatHeader:true,newSlideStartY:1.9});
   s.addShape(pptx.ShapeType.roundRect,{x:8.75,y:1.9,w:3.88,h:4.85,fill:{color:BLACK},line:{color:BLACK},rectRadius:0.14});
@@ -1389,7 +1418,7 @@ async function buildPPT(){
   s.addText(`* ${curNote()} La inversión en pauta se paga aparte.`,{x:0.7,y:6.55,w:7.7,h:0.3,fontFace:F,fontSize:9,color:GREY,italic:true});
 
   /* 5. Pauta */
-  if(r.pautaMonto || r.pautaFee){
+  if(r.pautaMonto || r.pautaFee || r.pauta1){
     s = pptx.addSlide(); header(s,"Pauta digital","Inversión en medios");
     (S.pauta.redes.length?S.pauta.redes:["Por definir"]).forEach((n,i)=>{
       s.addShape(pptx.ShapeType.roundRect,{x:0.7+i*1.85,y:1.95,w:1.7,h:0.5,fill:{color:BLUE},line:{color:BLUE},rectRadius:0.25});
@@ -1402,7 +1431,7 @@ async function buildPPT(){
       s.addText(note,{x:x+0.4,y:4.5,w:5.05,h:1.3,fontFace:F,fontSize:12,color:dark?"C9CEDB":GREY,valign:"top"});
     };
     card(0.7,"Inversión en plataformas", r.pautaMonto?`${fmt(r.pautaMonto)} /mes`:"Por definir", `La paga ${emp} directamente a las plataformas. No forma parte de la inversión de agencia.`, false);
-    if(r.pautaFee) card(6.78,"Gestión de pauta",`${fmt(r.pautaFee)} /mes`,"Estrategia, configuración, optimización y reporte mensual de campañas. Más impuestos.",true);
+    if(r.pauta1 || r.pautaFee) card(6.78,"Gestión de pauta",`${fmt(r.pautaFee)} /mes`,`Mes 1 (configuración de plataformas y análisis): ${fmt(r.pauta1)}. Desde el mes 2: optimización continua y reporte mensual. Más impuestos.`,true);
   }
 
   /* 6. Ruta de implementación */
