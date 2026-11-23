@@ -82,7 +82,7 @@ main{padding-block:28px 60px}
 .logo-drop .ph strong{display:block;font-size:30px;color:var(--accent);font-weight:900;line-height:1;margin-bottom:6px}
 .logo-tools{display:flex;gap:6px;justify-content:center;margin-top:8px}
 .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px}
-@media (max-width:520px){.fields{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.fields .field{grid-column:1/-1}.fields .field:has(#fFecha),.fields .field:has(#fVigencia){grid-column:auto}}
 .field{display:flex;flex-direction:column;gap:5px;min-width:0}
 .field.full{grid-column:1/-1}
 .field label{font-size:12px;font-weight:700;color:var(--muted)}
@@ -264,17 +264,131 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
 .sign{display:flex;flex-direction:column;gap:6px}
 .sign .line{display:block;height:40px;border-bottom:1.5px solid #161616}
 .sign .lb{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#5B6275}
-.pdfing .paper{border-radius:0;box-shadow:none;border:0}
-.pdfing .pp-body{display:block}
-.pdfing .pp-body > *{margin-bottom:28px}
-.pdfing .pp-svc{display:block;font-size:0}
-.pdfing .pp-card{display:inline-block;vertical-align:top;width:calc(50% - 7px);margin:0 14px 14px 0;font-size:15px}
-.pdfing .pp-card:nth-child(2n){margin-right:0}
-.pdfing .pp-steps{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pdfdoc{font-family:var(--font);color:#161616}
+.pd-pg{width:816px;height:1056px;position:relative;overflow:hidden;background:#fff}
+.pd-bar{height:8px;background:linear-gradient(90deg,#4C6EF4,#219DF5 55%,#5DEBD3)}
+.pd-in{padding:40px 64px 0}
+.pd-b{margin-bottom:18px}
+.pd-head{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.pd-jl{height:38px;width:auto}
+.pd-cl{height:64px;min-width:64px;max-width:220px;display:flex;align-items:center;justify-content:flex-end}
+.pd-cl img{max-height:64px;max-width:220px;object-fit:contain}
+.pd-cl span{font-weight:900;font-size:16px}
+.pd-k{margin-top:22px;font-size:12px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#4C6EF4}
+.pd-h1{font-size:34px;font-weight:900;letter-spacing:-.02em;margin:6px 0 0;line-height:1.1}
+.pd-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;background:#F4F6FB;border-radius:12px;padding:12px 16px}
+.pd-meta div{min-width:0}
+.pd-meta span{display:block;color:#4C6EF4;font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase}
+.pd-meta b{display:block;font-weight:700;font-size:13px;margin-top:2px}
+.pd-t{font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#4C6EF4;margin-bottom:10px}
+.pd-ul{margin:0;padding-left:18px;font-size:14px;display:grid;gap:3px}
+.pd-p{margin:0;font-size:14px;color:#2C3242}
+.pd-tb{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}
+.pdfdoc .pd-b.pd-b0{margin-bottom:0}
+.pd-tb th{background:#161616;color:#fff;text-align:left;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;padding:10px 14px}
+.pd-tb td{padding:9px 14px;border-bottom:1px solid #E6E9F2}
+.pd-tb .r{text-align:right;white-space:nowrap}
+.pd-tb td.r{font-weight:700}
+.pd-tot{margin-left:auto;width:60%;display:grid;gap:4px;font-size:13.5px}
+.pd-tl{display:flex;justify-content:space-between;gap:12px;color:#5B6275}
+.pd-tl b{color:#161616}
+.pd-big{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#4C6EF4,#219DF5);color:#fff;border-radius:12px;padding:10px 16px;margin:4px 0}
+.pd-big span{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.pd-big b{font-size:24px;font-weight:900}
+.pd-note{margin:10px 0 0;font-size:11.5px;color:#5B6275;text-align:right}
+.pd-box{background:#EEF1FA;border-radius:12px;padding:13px 16px;font-size:13.5px;color:#2C3242}
+.pd-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pd-card{border:1px solid #E1E5F0;border-radius:12px;padding:14px 16px}
+.pd-card b{font-size:14.5px;display:block}
+.pd-card small{display:block;color:#4C6EF4;font-weight:700;font-size:11.5px;margin:2px 0 6px}
+.pd-card ul{margin:0;padding-left:16px;font-size:12.5px;color:#2C3242;display:grid;gap:2px}
+.pd-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;counter-reset:s}
+.pd-steps li{counter-increment:s;border-top:3px solid #4C6EF4;padding-top:8px;font-size:12.5px;font-weight:600}
+.pd-steps li::before{content:counter(s,decimal-leading-zero);display:block;font-weight:900;font-size:18px}
+.pd-acc{border:1.5px solid #161616;border-radius:14px;padding:18px 22px}
+.pd-sign{display:grid;grid-template-columns:1fr 1fr;gap:20px 36px;margin-top:12px}
+.pd-sign i{display:block;height:34px;border-bottom:1.5px solid #161616}
+.pd-sign span{display:block;margin-top:5px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#5B6275}
+.pd-compact .pd-b{margin-bottom:13px}
+.pd-compact .pd-card{padding:10px 13px}
+.pd-compact .pd-card b{font-size:13.5px}
+.pd-compact .pd-card ul{font-size:11.5px;gap:1px}
+.pd-compact .pd-row{gap:10px}
+.pd-compact .pd-t{margin-bottom:7px}
+.pd-compact .pd-tb td{padding:7px 14px}
+.pd-compact .pd-acc{padding:14px 20px}
+.pd-compact .pd-sign{gap:12px 32px;margin-top:8px}
+.pd-compact .pd-sign i{height:28px}
+.pd-compact .pd-box{padding:10px 14px;font-size:12.5px}
+.pd-compact .pd-steps li{font-size:11.5px}
+.pd-cont{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:22px;border-bottom:1px solid #E6E9F2;font-size:12px;color:#5B6275;font-weight:600}
+.pd-cont img{height:22px}
+.pd-foot{position:absolute;left:0;right:0;bottom:0;height:84px;background:#161616;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 64px;font-size:12px}
+.pd-foot img{height:24px}
+.pd-foot span{color:#A9B0C2}
+.pd-foot b{flex:1;text-align:center;color:#5DEBD3;font-size:19px;font-weight:800}
 .pp-foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid #E6E9F2;padding-top:18px;font-size:12px;color:#5B6275}
 .pp-foot img{height:22px}
 .print-note{font-size:12px;color:var(--muted)}
 
+
+/* ===== Celular ===== */
+.pp-body > *, .grid > *, .editor > *{min-width:0}
+.mbar{display:none}
+@media (max-width:980px){
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;align-items:center;justify-content:space-between;gap:12px;
+    background:var(--black);color:#fff;border-top:1px solid #2B303C;
+    padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));transition:transform .2s}
+  .mbar.hide{transform:translateY(110%)}
+  .mbar span{display:block;font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#A9B0C2}
+  .mbar b{font-size:20px;font-weight:900;color:var(--mint)}
+  .mbar small{display:block;font-size:11px;color:#A9B0C2}
+  main{padding-bottom:110px}
+  .summary{position:static}
+}
+@media (max-width:620px){
+  .hero{padding-bottom:28px}
+  .hero h1{margin-top:28px}
+  .topbar img{height:30px}
+  .logo-drop{aspect-ratio:auto;height:120px}
+  .panel{padding:18px 16px}
+  .item{padding:12px 13px}
+  .ed-top{grid-template-columns:minmax(0,1fr)}
+  .ed-gain{align-items:end}
+  .ed-actions .btn{flex:1;justify-content:center}
+  /* tabla de costos como tarjetas */
+  table.costs{min-width:0}
+  table.costs thead{display:none}
+  table.costs tbody tr{display:grid;grid-template-columns:minmax(0,1fr) 64px auto 28px;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+  table.costs tbody td{padding:0;width:auto !important}
+  table.costs tbody td:first-child{grid-column:1/-1}
+  table.costs td:nth-child(1) input{min-width:0}
+  table.costs tbody tr{align-items:end}
+  table.costs tbody td:nth-child(2)::before,table.costs tbody td:nth-child(3)::before,table.costs tbody td:nth-child(4)::before{display:block;font-size:10.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
+  table.costs tbody td:nth-child(2)::before{content:"Costo (Q)"}
+  table.costs tbody td:nth-child(3)::before{content:"Cant."}
+  table.costs tbody td:nth-child(4)::before{content:"Subtotal"}
+  table.costs tbody td:nth-child(4){padding-bottom:8px}
+  table.costs tbody td:nth-child(5){padding-bottom:2px}
+  table.costs tfoot tr{display:flex;justify-content:space-between;align-items:center;padding-top:8px}
+  table.costs tfoot td{padding:0}
+  table.costs tfoot td:empty{display:none}
+  /* propuesta */
+  .pp-cover{padding:24px 20px}
+  .pp-cover .k{margin-top:28px}
+  .pp-logos .jl{height:28px}
+  .pp-logos .cl{height:48px}
+  .pp-body{padding:24px 18px 28px;gap:24px}
+  table.inv{min-width:0;font-size:12.5px}
+  table.inv th{padding:8px 6px;font-size:10px;letter-spacing:.08em}
+  table.inv td{padding:9px 6px}
+  table.inv tfoot td{padding:6px}
+  table.inv tfoot tr.total td{font-size:13.5px}
+  .pp-accept{padding:18px 16px}
+  .pp-foot{flex-direction:column;align-items:flex-start}
+  .proposal-wrap > .panel-head > div{width:100%}
+  .proposal-wrap > .panel-head .btn{flex:1;justify-content:center}
+}
 @media print{
   @page{size:letter;margin:12mm}
   body{background:#fff !important}
@@ -415,7 +529,7 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
           </div>
           <div class="field" style="margin-top:12px">
             <label for="fMeses" style="color:#A9B0C2">Duración del contrato</label>
-            <select id="fMeses" style="background:#22252D;color:#fff"><option value="1">1 mes</option><option value="3" selected>3 meses</option><option value="6">6 meses</option><option value="12">12 meses</option><option value="0">Indefinido</option></select>
+            <select id="fMeses" style="background:#22252D;color:#fff"><option value="1">1 mes</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12" selected>12 meses</option><option value="0">Indefinido</option></select>
           </div>
           <div class="contract num"><span id="sContratoLbl">Total del contrato con impuestos</span><b id="sContrato">Q0</b></div>
           <div class="pauta-sum" id="sPauta" hidden></div>
@@ -455,6 +569,10 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
   </div>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="mbar" id="mbar" aria-label="Total de la cotización">
+  <div><span>Inversión primer mes</span><b class="num" id="mTotal">Q0</b><small id="mSub"></small></div>
+  <button class="btn primary" id="mGo" type="button">Ver resumen</button>
+</div>
 
 <script>
 (function(){
@@ -565,7 +683,7 @@ const KEY = "jl-cotizador-v4";
 const today = new Date().toISOString().slice(0,10);
 function fresh(){
   return {client:{empresa:"",contacto:"",asesor:"",fecha:today,vigencia:"30",objetivos:"",notas:"",pago:"Los servicios mensuales se pagan dentro de los primeros 5 días de cada mes.",logo:""},
-    sel:{}, custom:[], open:null, meses:"3", pauta:{monto:"",redes:[],gestion:false,cost:PAUTA.cost,fee:PAUTA.fee}, cfg:{...DEFAULTS}, cat:"all", internal:false};
+    sel:{}, custom:[], open:null, meses:"12", pauta:{monto:"",redes:[],gestion:false,cost:PAUTA.cost,fee:PAUTA.fee}, cfg:{...DEFAULTS}, cat:"all", internal:false};
 }
 function example(){
   const s = fresh();
@@ -758,6 +876,8 @@ function renderSummary(){
   $("sIva").textContent = fmt(r.iva1);
   $("sTimPct").textContent = S.cfg.timbre; $("sTim").textContent = fmtc(r.tim1);
   $("sTotal").textContent = fmt(r.total1);
+  $("mTotal").textContent = fmt(r.total1);
+  $("mSub").textContent = r.lines.length ? `${r.lines.length + (r.pautaFee?1:0)} servicio${r.lines.length + (r.pautaFee?1:0)===1?"":"s"} · con impuestos` : "Elige servicios";
   $("sTotalSub").textContent = `Servicios${r.admin?" + administrativos":""} + IVA ${S.cfg.iva}% + timbre ${S.cfg.timbre}%`;
   $("sRecurrente").textContent = fmt(r.rec);
   $("sContrato").textContent = r.indef ? `${fmt(r.rec)}/mes` : fmt(r.contrato);
@@ -818,7 +938,7 @@ function renderPaper(r){
             <tr><td colspan="2">Timbre de prensa ${S.cfg.timbre}%</td><td class="r num">${fmtc(r.tim1)}</td></tr>
             <tr class="total"><td colspan="2">Inversión primer mes</td><td class="r num">${fmt(r.total1)}</td></tr>
             ${r.mensual?`<tr><td colspan="2">Mes 2 en adelante (con impuestos)</td><td class="r num"><b>${fmt(r.rec)}/mes</b></td></tr>
-            <tr><td colspan="2">${r.indef?"Plazo del contrato":`Total contrato ${r.meses} ${r.meses>1?"meses":"mes"} (con impuestos)`}</td><td class="r num"><b>${r.indef?"Indefinido":fmt(r.contrato)}</b></td></tr>`:""}
+            <tr><td colspan="2">Vigencia del contrato</td><td class="r num"><b>${vigenciaTxt(r)}</b></td></tr>`:""}
           </tfoot>
         </table></div>
         <p style="font-size:12px;color:#5B6275;margin-top:10px">${curNote()} La producción de videos adicionales a los incluidos en cada plan se cotiza aparte.</p>
@@ -1014,6 +1134,12 @@ $("resetYes").addEventListener("click", ()=>{
 });
 
 /* Navegar / copiar / PDF */
+$("mGo").addEventListener("click", ()=> document.querySelector(".summary").scrollIntoView({behavior:"smooth", block:"start"}));
+if("IntersectionObserver" in window){
+  const seen = new Set();
+  const io = new IntersectionObserver(es=>{ es.forEach(e=> e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)); $("mbar").classList.toggle("hide", seen.size>0) });
+  io.observe(document.querySelector(".sum-card")); io.observe($("propuesta"));
+}
 $("goProposal").addEventListener("click", ()=> $("propuesta").scrollIntoView({behavior:"smooth"}));
 function summaryText(){
   const r = calc(), c = S.client;
@@ -1022,7 +1148,7 @@ function summaryText(){
   if(r.pautaFee) L.push(`• Gestión de pauta: ${fmt(r.pautaFee)} /mes`);
   if(r.admin) L.push(`• Costos administrativos: ${fmt(r.admin)}`);
   L.push("", `Subtotal primer mes: ${fmt(r.base1)}`, `IVA ${S.cfg.iva}%: ${fmt(r.iva1)}`, `Timbre de prensa ${S.cfg.timbre}%: ${fmtc(r.tim1)}`, `Inversión primer mes: ${fmt(r.total1)}`);
-  if(r.mensual) L.push(`Mes 2 en adelante: ${fmt(r.rec)} /mes`, r.indef ? "Plazo: indefinido" : `Total contrato ${r.meses} meses: ${fmt(r.contrato)}`);
+  if(r.mensual) L.push(`Mes 2 en adelante: ${fmt(r.rec)} /mes`, `Vigencia del contrato: ${vigenciaTxt(r)}`);
   if(r.pautaMonto) L.push("", `Pauta (aparte, pagada directo a plataformas): ${fmt(r.pautaMonto)} /mes`);
   L.push("", curNote());
   if(c.pago) L.push(`Condiciones de pago: ${c.pago}`);
@@ -1053,27 +1179,116 @@ if(!framed) $("pptBtn").addEventListener("click", async ()=>{
   finally{ b.disabled = false; b.textContent = old }
 });
 
-/* ============ PDF directo (sin diálogo de impresión) ============ */
-function loadH2P(){
-  if(window.html2pdf) return Promise.resolve();
-  return new Promise((res,rej)=>{ const s=document.createElement("script");
-    s.src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"; s.onload=res; s.onerror=rej; document.head.appendChild(s) });
+/* ============ PDF directo: hojas tamaño carta completas ============ */
+function loadJs(src, test){
+  if(test()) return Promise.resolve();
+  return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s) });
 }
-function pdfWorker(){
+const vigenciaTxt = r => r.indef ? "Indefinida" : `${r.meses} ${r.meses>1?"meses":"mes"}`;
+const PD_COLS = `<colgroup><col style="width:58%"><col style="width:22%"><col style="width:20%"></colgroup>`;
+const PD_THEAD = `<table class="pd-tb">${PD_COLS}<thead><tr><th>Servicio</th><th>Tipo de pago</th><th class="r">Inversión</th></tr></thead></table>`;
+function pdfBlocks(r){
+  const c = S.client, emp = c.empresa || "Cliente", B = [];
+  const objetivos = (c.objetivos||"").split("\n").map(s=>s.trim()).filter(Boolean);
+  const venc = (()=>{ if(!c.fecha) return ""; const d=new Date(c.fecha+"T12:00:00"); d.setDate(d.getDate()+(+c.vigencia||30)); return fechaLarga(d.toISOString().slice(0,10)) })();
+  const clLogo = c.logo ? `<img src="${c.logo}" alt="">` : `<span>${esc(emp)}</span>`;
+  B.push({first:true, html:`<div class="pd-head"><img class="pd-jl" src="${LOGO_DARK}" alt="JL Marketing"><div class="pd-cl">${clLogo}</div></div>
+    <div class="pd-k">Propuesta de servicios de marketing</div><h1 class="pd-h1">${esc(emp)}</h1>`});
+  const meta = [["Fecha", fechaLarga(c.fecha)], c.contacto?["Para", c.contacto]:null, c.asesor?["Preparado por", c.asesor]:null, venc?["Válida hasta", venc]:null].filter(Boolean);
+  B.push({html:`<div class="pd-meta">${meta.map(([k,v])=>`<div><span>${k}</span><b>${esc(v)}</b></div>`).join("")}</div>`});
+  if(objetivos.length) B.push({html:`<div class="pd-t">Objetivos</div><ul class="pd-ul">${objetivos.map(o=>`<li>${esc(o)}</li>`).join("")}</ul>`});
+  const rows = r.lines.map(l=>[l.name + (l.qty>1?` · ${l.qty} × ${fmt(l.unitPrice)}`:""), l.freq==="mensual"?"Mensual":"Pago único", fmt(l.total)]);
+  if(r.pautaFee) rows.push(["Gestión de pauta" + (S.pauta.redes.length?` · ${redesTxt()}`:""), "Mensual", fmt(r.pautaFee)]);
+  if(r.admin) rows.push(["Costos administrativos", r.adminMonthly?"Mensual":"Pago único", fmt(r.admin)]);
+  const rowHTML = x => `<table class="pd-tb">${PD_COLS}<tbody><tr><td>${esc(x[0])}</td><td>${x[1]}</td><td class="r">${x[2]}</td></tr></tbody></table>`;
+  if(!rows.length) rows.push(["Sin servicios","",""]);
+  rows.forEach((x,i)=>B.push({kind:"row", tight:true, html: i===0 ? `<div class="pd-t">Inversión</div>${PD_THEAD}${rowHTML(x)}` : rowHTML(x)}));
+  B.push({html:`<div class="pd-tot">
+      <div class="pd-tl"><span>Subtotal primer mes</span><b>${fmt(r.base1)}</b></div>
+      <div class="pd-tl"><span>IVA ${S.cfg.iva}%</span><b>${fmt(r.iva1)}</b></div>
+      <div class="pd-tl"><span>Timbre de prensa ${S.cfg.timbre}%</span><b>${fmtc(r.tim1)}</b></div>
+      <div class="pd-big"><span>Inversión primer mes</span><b>${fmt(r.total1)}</b></div>
+      ${r.mensual?`<div class="pd-tl"><span>Mes 2 en adelante (con impuestos)</span><b>${fmt(r.rec)} /mes</b></div>
+      <div class="pd-tl"><span>Vigencia del contrato</span><b>${vigenciaTxt(r)}</b></div>`:""}
+    </div><p class="pd-note">${curNote()} La producción de videos adicionales a los incluidos en cada plan se cotiza aparte.</p>`});
+  if(r.pautaMonto) B.push({html:`<div class="pd-box"><b>Pauta digital:</b> inversión sugerida de <b>${fmt(r.pautaMonto)} al mes</b>${S.pauta.redes.length?` en ${esc(redesTxt())}`:""}. Este monto lo paga ${esc(emp)} directamente a las plataformas y no forma parte de la inversión de agencia.</div>`});
+  if(c.notas) B.push({html:`<div class="pd-t">Notas</div><p class="pd-p">${esc(c.notas).replace(/\n/g,"<br>")}</p>`});
+  const cards = r.lines.map(l=>`<div class="pd-card"><b>${esc(l.name)}${l.qty>1?` · ${l.qty} ${esc(l.it.unit)}${/[aeiou]$/.test(l.it.unit)?"s":"es"}`:""}</b><small>${l.freq==="mensual"?"Servicio mensual":"Pago único"}</small><ul>${l.inc.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`);
+  for(let i=0;i<cards.length;i+=2) B.push({html:`${i===0?`<div class="pd-t">Qué incluye cada servicio</div>`:""}<div class="pd-row">${cards.slice(i,i+2).join("")}</div>`});
+  B.push({html:`${c.pago?`<div class="pd-t">Condiciones de pago</div><p class="pd-p">${esc(c.pago).replace(/\n/g,"<br>")}</p>`:""}
+    <div class="pd-t" style="margin-top:18px">Próximos pasos</div><ol class="pd-steps"><li>Revisión de la propuesta con su equipo</li><li>Reunión para ajustar alcance</li><li>Inversión final y firma</li><li>Reunión de arranque</li></ol>`});
+  B.push({html:`<div class="pd-acc"><div class="pd-t">Aceptación de la cotización</div><p class="pd-p">Al firmar, ${esc(emp)} acepta los servicios, la inversión y las condiciones de pago descritos en esta propuesta.</p>
+    <div class="pd-sign"><div><i></i><span>Firma</span></div><div><i></i><span>Fecha</span></div><div><i></i><span>Nombre</span></div><div><i></i><span>Puesto</span></div></div></div>`});
+  return B;
+}
+function pdfPaginate(box, r, compact){
+  box.classList.toggle("pd-compact", compact);
+  const meas = document.createElement("div"); meas.className = "pd-in"; meas.style.cssText = "position:static;width:688px;padding:0"; box.appendChild(meas);
+  const blocks = pdfBlocks(r).map(b=>{ const d=document.createElement("div"); d.className="pd-b"+(b.tight?" pd-b0":""); d.innerHTML=b.html; meas.appendChild(d); return {...b, el:d} });
+  const hd = document.createElement("div"); hd.className="pd-b pd-b0"; hd.innerHTML=PD_THEAD; meas.appendChild(hd);
+  const headH = hd.getBoundingClientRect().height;
+  blocks.forEach((b,i)=>{ const nx = blocks[i+1]; b.h = b.el.getBoundingClientRect().height + parseFloat(getComputedStyle(b.el).marginBottom);
+    if(b.tight && !(nx && nx.tight)) b.h += 18; delete b.el });
+  meas.remove();
+  const AVAIL = 1056 - 8 - 40 - 84 - 22, CONT_HEAD = 50;
+  const pages = [[]]; let used = 0;
+  blocks.forEach((b,i)=>{ const room = AVAIL - (pages.length>1 ? CONT_HEAD : 0);
+    /* los totales no se separan de la última fila de la tabla */
+    const nx = blocks[i+1], need = b.h + (b.kind==="row" && nx && nx.kind!=="row" ? Math.min(nx.h, 260) : 0);
+    if(used + need > room && pages[pages.length-1].length){ pages.push([]); used = (b.kind==="row" ? headH : 0) }
+    pages[pages.length-1].push(b); used += b.h });
+  /* que la última hoja no quede casi vacía: pasar bloques de la hoja anterior */
+  const usedOf = pg => pg.reduce((s,b)=>s+b.h,0), roomLast = AVAIL - CONT_HEAD;
+  while(pages.length > 1){
+    const last = pages[pages.length-1], prev = pages[pages.length-2];
+    if(usedOf(last) >= roomLast*0.5 || prev.length <= 1) break;
+    if(prev === pages[0] && prev.length <= 4) break;
+    const mv = prev[prev.length-1];
+    if(mv.kind === "row") break;
+    if(usedOf(last) + mv.h > roomLast) break;
+    prev.pop(); last.unshift(mv);
+  }
+  return pages;
+}
+function pdfPages(r){
   const emp = S.client.empresa || "Cliente";
-  document.body.classList.add("pdfing");
-  return html2pdf().set({
-    margin:[10,10,10,10],
-    filename:`Propuesta JL Marketing - ${emp}.pdf`,
-    image:{type:"jpeg", quality:0.95},
-    html2canvas:{scale:2, useCORS:true, backgroundColor:"#ffffff", scrollX:0, scrollY:0},
-    jsPDF:{unit:"mm", format:"letter", orientation:"portrait"},
-    pagebreak:{mode:["css"], avoid:[".pp-cover",".pp-card",".pp-accept",".pp-pauta",".pp-steps",".tbl-wrap",".pp-sec:not(:has(.pp-svc)):not(:has(table))",".pp-foot"]}
-  }).from($("paper"));
+  const box = document.createElement("div"); box.className = "pdfdoc"; box.style.cssText = "position:absolute;left:-12000px;top:0";
+  document.body.appendChild(box);
+  let pages = pdfPaginate(box, r, false);
+  if(pages.length > 1){ const alt = pdfPaginate(box, r, true); if(alt.length < pages.length) pages = alt; else box.classList.remove("pd-compact") }
+  const N = pages.length;
+  box.innerHTML = pages.map((pg,n)=>`<section class="pd-pg">
+      <div class="pd-bar"></div>
+      <div class="pd-in">
+        ${n>0?`<div class="pd-cont"><img src="${LOGO_DARK}" alt=""><span>Propuesta para ${esc(emp)}</span></div>`:""}
+        ${pg[0] && pg[0].kind==="row" && !/class="pd-t"/.test(pg[0].html) ? `<div class="pd-b pd-b0">${PD_THEAD}</div>` : ""}
+        ${pg.map((b,k)=>`<div class="pd-b${b.tight && pg[k+1] && pg[k+1].tight ? " pd-b0" : ""}">${b.html}</div>`).join("")}
+      </div>
+      <div class="pd-foot">${n===N-1
+        ? `<b>En breve continuamos para resolver dudas o confirmar la propuesta.</b>`
+        : `<img src="${LOGO_WHITE}" alt=""><span>Página ${n+1} de ${N}</span>`}</div>
+    </section>`).join("");
+  return box;
 }
 async function buildPDF(){
-  await loadH2P(); if(document.fonts) await document.fonts.ready;
-  try{ await pdfWorker().save() } finally { document.body.classList.remove("pdfing") }
+  await Promise.all([
+    loadJs("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js", ()=>window.jspdf),
+    loadJs("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js", ()=>window.html2canvas)
+  ]);
+  if(document.fonts) await document.fonts.ready;
+  const box = pdfPages(calc());
+  try{
+    await Promise.all([...box.querySelectorAll("img")].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r})));
+    const pdf = new window.jspdf.jsPDF({unit:"pt", format:"letter", orientation:"portrait"});
+    const pgs = [...box.querySelectorAll(".pd-pg")];
+    for(let i=0;i<pgs.length;i++){
+      const cv = await html2canvas(pgs[i], {scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false});
+      if(i) pdf.addPage("letter","portrait");
+      pdf.addImage(cv.toDataURL("image/jpeg",0.92), "JPEG", 0, 0, 612, 792);
+    }
+    pdf.save(`Propuesta JL Marketing - ${S.client.empresa||"Cliente"}.pdf`);
+    return pdf;
+  } finally { box.remove() }
 }
 
 /* ============ POWERPOINT (estructura de la propuesta Holden, colores JL) ============ */
@@ -1168,7 +1383,7 @@ async function buildPPT(){
   if(r.mensual){
     s.addText("Mes 2 en adelante",{x:9.05,y:4.6,w:3.3,h:0.3,fontFace:F,fontSize:10.5,color:"A9B0C2"});
     s.addText(`${fmt(r.rec)} /mes`,{x:9.05,y:4.9,w:3.3,h:0.4,fontFace:F,fontSize:17,bold:true,color:MINT});
-    s.addText(r.indef?"Plazo del contrato: indefinido":`Total contrato ${r.meses} ${r.meses>1?"meses":"mes"}: ${fmt(r.contrato)}`,{x:9.05,y:5.45,w:3.3,h:0.5,fontFace:F,fontSize:10.5,color:WHITE});
+    s.addText(`Vigencia del contrato: ${vigenciaTxt(r)}`,{x:9.05,y:5.45,w:3.3,h:0.5,fontFace:F,fontSize:10.5,color:WHITE});
   }
   s.addText("Montos con impuestos incluidos",{x:9.05,y:6.2,w:3.3,h:0.3,fontFace:F,fontSize:9,color:"A9B0C2"});
   s.addText(`* ${curNote()} La inversión en pauta se paga aparte.`,{x:0.7,y:6.55,w:7.7,h:0.3,fontFace:F,fontSize:9,color:GREY,italic:true});
