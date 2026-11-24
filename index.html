@@ -624,15 +624,15 @@ const CATS = [
 const K = (name, cost, qty=1, k) => ({name, cost, qty, ...(k?{k}:{})});
 const CATALOG = [
   {id:"plan-completo", cat:"redes", name:"Plan completo de redes y reels", desc:"Estrategia, 15 publicaciones, reels grabados, 8 historias, programación y reporte", freq:"mensual", unit:"mes", qty:1, fixedQty:true,
-    costs:[K("Reels (grabación y edición)",800,4,"reels"),K("Community manager",1000),K("Directora de cuenta",1500),K("Gastos administrativos",1500)], fee:7000, minFee:7000, mode:"fixed",
+    costs:[K("Reels (grabación y edición)",800,4,"reels"),K("Community manager",1500),K("Directora de cuenta",1500),K("Gastos administrativos",1000)], fee:7000, minFee:7000, mode:"fixed",
     content:{lead:"Estrategia", items:[{t:"post",n:15,f:"mixto"},{t:"historia",n:8,f:"mixto"}], reelsG:4},
     inc:["Estrategia y matriz mensual de contenido","@content","Publicación y programación del contenido","Propuestas en tendencia y crecimiento orgánico","Reporte mensual de resultados"]},
   {id:"plan-esencial", cat:"redes", name:"Plan esencial de redes", desc:"12 publicaciones y 8 historias al mes, sin grabación de reels", freq:"mensual", unit:"mes", qty:1, fixedQty:true,
-    costs:[K("Community manager",1000),K("Diseñador",1200),K("Directora de cuenta",800),K("Gastos administrativos",500)], fee:3500, mode:"fixed",
+    costs:[K("Community manager",1500),K("Diseñador",1200),K("Directora de cuenta",800),K("Gastos administrativos",1000)], fee:3500, mode:"fixed",
     content:{lead:"Estrategia", items:[{t:"post",n:12,f:"mixto"},{t:"historia",n:8,f:"mixto"}], reelsG:0},
     inc:["Matriz mensual de contenido","@content","Programación y respuesta básica","Reporte mensual de resultados"]},
   {id:"acompanamiento", cat:"redes", name:"Acompañamiento estratégico", desc:"Asesoría mensual, revisión de contenido y guiones. El cliente diseña y publica", freq:"mensual", unit:"mes", qty:1, fixedQty:true,
-    costs:[K("Directora de cuenta",1500),K("Estratega / guionista",1000),K("Gastos administrativos",500)], fee:2000, mode:"fixed",
+    costs:[K("Directora de cuenta",1500),K("Estratega / guionista",1000),K("Gastos administrativos",1000)], fee:2000, mode:"fixed",
     inc:["Asesoría estratégica mensual al equipo","Revisión de contenido antes de publicar","Guiones para videos","No incluye diseño, grabación ni publicación"]},
   {id:"post-extra", cat:"redes", name:"Publicaciones adicionales", desc:"Post o carrusel extra al plan contratado", freq:"mensual", unit:"publicación", qty:4,
     costs:[K("Diseño y copy",100)], pct:30,
@@ -752,7 +752,7 @@ function S0pct(){ return (S && S.cfg && +S.cfg.minPct) || 30 }
 const DEFAULTS = {admin:0, adminFreq:"once", iva:12, timbre:0.05, minPct:30, currency:"GTQ", rate:7.4};
 
 /* ============ ESTADO ============ */
-const KEY = "jl-cotizador-v5";
+const KEY = "jl-cotizador-v7";
 const today = new Date().toISOString().slice(0,10);
 function fresh(){
   return {client:{empresa:"",contacto:"",asesor:"",fecha:today,vigencia:"30",objetivos:"",notas:"",pago:"Los servicios mensuales se pagan dentro de los primeros 5 días de cada mes.",logo:""},
