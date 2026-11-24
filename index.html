@@ -148,6 +148,7 @@ table.costs tfoot td{padding-top:8px}
 .ct{grid-column:2/-1;cursor:default;display:grid;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
 .ct-h{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .ct-line{display:grid;grid-template-columns:minmax(0,1.3fr) 84px minmax(0,1fr) 28px;gap:8px;align-items:center;max-width:560px}
+.pp-info p{margin:0 0 10px;line-height:1.6}
 .ct-head span{font-size:11px;font-weight:700;color:var(--muted)}
 .ct-na{color:var(--muted);padding-left:10px}
 .ct-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
@@ -476,6 +477,10 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
                 <select id="fVigencia"><option value="15">15 días</option><option value="30" selected>30 días</option><option value="60">60 días</option></select></div>
               <div class="field full"><label for="fObjetivos">Objetivos (uno por línea)</label>
                 <textarea id="fObjetivos" placeholder="Definir un concepto creativo que nos diferencie&#10;Ordenar la presencia en redes con objetivos medibles"></textarea></div>
+              <div class="field full"><label for="fInfoT">Información importante: título de la sección</label>
+                <input id="fInfoT" placeholder="Ej. Estrategia digital"></div>
+              <div class="field full"><label for="fInfo">Información importante: texto (aparece en la propuesta)</label>
+                <textarea id="fInfo" placeholder="Ej. La estrategia se enfoca en posicionar la marca en Instagram y TikTok con contenido educativo...&#10;Cada salto de línea es un párrafo. Empieza una línea con - para hacer una viñeta."></textarea></div>
               <div class="field full"><label for="fPago">Condiciones de pago</label>
                 <textarea id="fPago" style="min-height:60px"></textarea></div>
               <div class="field full"><label for="fNotas">Notas para el cliente (opcional)</label>
@@ -755,7 +760,7 @@ const DEFAULTS = {admin:0, adminFreq:"once", iva:12, timbre:0.05, minPct:30, cur
 const KEY = "jl-cotizador-v7";
 const today = new Date().toISOString().slice(0,10);
 function fresh(){
-  return {client:{empresa:"",contacto:"",asesor:"",fecha:today,vigencia:"30",objetivos:"",notas:"",pago:"Los servicios mensuales se pagan dentro de los primeros 5 días de cada mes.",logo:""},
+  return {client:{empresa:"",contacto:"",asesor:"",fecha:today,vigencia:"30",objetivos:"",infoT:"Estrategia digital",info:"",notas:"",pago:"Los servicios mensuales se pagan dentro de los primeros 5 días de cada mes.",logo:""},
     sel:{}, custom:[], open:null, meses:"12", pauta:{monto:"",redes:[],gestion:false,cost:PAUTA.cost,fee:PAUTA.fee,cost1:PAUTA.cost1,fee1:PAUTA.fee1,inc1:PAUTA.inc1}, cfg:{...DEFAULTS}, cat:"all", internal:false};
 }
 function example(){
@@ -773,6 +778,8 @@ if(!S || !S.client) S = example();
 S.cfg = {...DEFAULTS, ...(S.cfg||{})};
 if(!S.cfg.adminV2){ S.cfg.admin = 0; S.cfg.adminV2 = true } /* los administrativos ya van dentro de cada servicio */
 S.custom = S.custom || [];
+if(S.client.infoT == null) S.client.infoT = "Estrategia digital";
+if(S.client.info == null) S.client.info = "";
 if(S.client.pago == null) S.client.pago = "Los servicios mensuales se pagan dentro de los primeros 5 días de cada mes.";
 S.pauta = {...fresh().pauta, ...(S.pauta||{})}; if(!Array.isArray(S.pauta.redes)) S.pauta.redes = [];
 const redesTxt = () => { const r=S.pauta.redes; return r.length>1 ? r.slice(0,-1).join(", ")+" y "+r[r.length-1] : (r[0]||"") };
@@ -981,6 +988,19 @@ function fechaLarga(iso){
   const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
   return `${d} de ${meses[m-1]} de ${y}`;
 }
+function infoBlocks(){
+  const c = S.client, lines = (c.info||"").split("\n").map(x=>x.trim()).filter(Boolean);
+  if(!lines.length) return null;
+  const out = []; let ul = [];
+  const flush = () => { if(ul.length){ out.push({ul}); ul = [] } };
+  lines.forEach(x=>{ if(/^[-•*]\s*/.test(x)) ul.push(x.replace(/^[-•*]\s*/,"")); else { flush(); out.push({p:x}) } });
+  flush();
+  return {title: (c.infoT||"").trim() || "Información importante", parts: out, lines};
+}
+function infoHTML(pc, ulc){
+  const b = infoBlocks(); if(!b) return "";
+  return b.parts.map(x=> x.p ? `<p class="${pc}">${esc(x.p)}</p>` : `<ul class="${ulc}">${x.ul.map(y=>`<li>${esc(y)}</li>`).join("")}</ul>`).join("");
+}
 function renderPaper(r){
   const c = S.client, emp = c.empresa || "su empresa";
   const objetivos = (c.objetivos||"").split("\n").map(s=>s.trim()).filter(Boolean);
@@ -1007,6 +1027,7 @@ function renderPaper(r){
     </div>
     <div class="pp-body">
       ${objetivos.length?`<section class="pp-sec"><h3>Objetivos</h3><ul>${objetivos.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></section>`:""}
+      ${infoBlocks()?`<section class="pp-sec pp-info"><h3>${esc(infoBlocks().title)}</h3>${infoHTML("","")}</section>`:""}
       <section class="pp-sec"><h3>Servicios propuestos</h3>
         ${svc?`<div class="pp-svc">${svc}</div>`:`<p style="color:#5B6275">Aún no hay servicios seleccionados.</p>`}
       </section>
@@ -1045,7 +1066,7 @@ function renderPaper(r){
 }
 
 /* ============ EVENTOS ============ */
-const fieldMap = {fEmpresa:"empresa",fContacto:"contacto",fAsesor:"asesor",fFecha:"fecha",fVigencia:"vigencia",fObjetivos:"objetivos",fNotas:"notas",fPago:"pago"};
+const fieldMap = {fEmpresa:"empresa",fContacto:"contacto",fAsesor:"asesor",fFecha:"fecha",fVigencia:"vigencia",fObjetivos:"objetivos",fInfoT:"infoT",fInfo:"info",fNotas:"notas",fPago:"pago"};
 function loadForm(){
   for(const [id,k] of Object.entries(fieldMap)) $(id).value = S.client[k] || "";
   $("fMeses").value = S.meses; $("pMonto").value = S.pauta.monto; $("pGest").checked = !!S.pauta.gestion; $("pCost").value = S.pauta.cost; $("pGain").value = S.pauta.fee; $("pCost1").value = S.pauta.cost1; $("pGain1").value = S.pauta.fee1; $("pInc1").value = S.pauta.inc1; renderPlataformas();
@@ -1107,8 +1128,9 @@ $("cats").addEventListener("click", e=>{
   S.cat = b.dataset.cat; save(); renderCats(); renderCatalog();
 });
 function toggle(id){
-  if(S.sel[id]){ delete S.sel[id]; if(S.open===id) S.open=null }
-  else S.sel[id] = newSel(item(id));
+  S.memo = S.memo || {};
+  if(S.sel[id]){ S.memo[id] = S.sel[id]; delete S.sel[id]; if(S.open===id) S.open=null }
+  else S.sel[id] = S.memo[id] || newSel(item(id));
   refreshItem(id); touch();
 }
 function openEditor(id){
@@ -1131,6 +1153,7 @@ $("catalog").addEventListener("click", e=>{
     if(a==="ct-add" || a==="ct-del"){
       const c = contentOf(it, s); s.content = {items: c.items, reelsG: c.reelsG};
       if(a==="ct-add"){ s.content.items.push({t:"post", n:1, f:"estatica"}) } else s.content.items.splice(+act.dataset.i, 1);
+      delete s.inc;
       refreshItem(id); touch();
       if(a==="ct-add"){ const f=$(`ct-${id}-${s.content.items.length-1}-n`); if(f){ f.focus(); f.select() } }
       return;
@@ -1138,7 +1161,7 @@ $("catalog").addEventListener("click", e=>{
     if(a==="add"){ s.costs.push({name:"Nuevo costo", cost:0, qty:1}); refreshItem(id); touch(); const f=$(`ec-${id}-${s.costs.length-1}-n`); if(f){f.focus();f.select()} return }
     if(a==="del"){ s.costs.splice(+act.dataset.row,1); refreshItem(id); touch(); return }
     if(a==="min"){ if(it.minFee != null){ s.mode="fixed"; s.fee=it.minFee } else { s.mode="pct"; s.pct=+S.cfg.minPct||0 } refreshItem(id); touch(); toast("Ganancia ajustada al mínimo"); return }
-    if(a==="reset"){ const q0=s.qty; S.sel[id] = {...newSel(it), qty:q0}; refreshItem(id); touch(); toast("Valores restablecidos"); return }
+    if(a==="reset"){ const q0=s.qty; S.sel[id] = {...newSel(it), qty:q0}; if(S.memo) delete S.memo[id]; refreshItem(id); touch(); toast("Valores restablecidos"); return }
     if(a==="remove"){ S.custom = S.custom.filter(c=>c.id!==id); delete S.sel[id]; S.open=null; renderCatalog(); touch(); toast("Servicio eliminado"); return }
   }
   if(e.target.closest("[data-stop]")) return;
@@ -1166,7 +1189,9 @@ function onEdit(e, commit){
       else { x[k] = v; if(k==="t" && v!=="reel" && !x.f) x.f = "mixto" }
       if(k==="t") commit = true;
     }
+    delete s.inc;
     const d = $(`ds-${id}`); if(d) d.textContent = descOf(it, s);
+    const ta = $(`einc-${id}`); if(ta && document.activeElement !== ta){ const l = lineOf(it); if(l) ta.value = l.inc.join("\n") }
     if(!commit){ liveUpdate(id); save(); renderSummary(); return }
     refreshItem(id); touch(); return;
   }
@@ -1181,7 +1206,8 @@ function onEdit(e, commit){
       if(k==="fee"){ s.mode="fixed"; s.fee=Math.max(0, +v || 0) } else { s.mode="pct"; s.pct=Math.max(0, +v || 0) }
       if(!commit){ liveUpdate(id); save(); renderSummary(); return }
     }
-    else if(k==="inc"){ s.inc = v.split("\n").map(x=>x.trim()).filter(Boolean); save(); renderSummary(); return }
+    else if(k==="inc"){ const arr = v.split("\n").map(x=>x.trim()).filter(Boolean); delete s.inc; const auto = lineOf(item(id)).inc;
+      if(arr.join("\n") !== auto.join("\n")) s.inc = arr; save(); renderSummary(); return }
     else if(k==="name"){ s.name = v; save(); renderSummary(); return }
     else s[k] = v;
   } else if(t.id === `q-${id}`){ if(!commit) return; s.qty = Math.max(1, +v || 1) }
@@ -1311,6 +1337,9 @@ function pdfBlocks(r){
   const meta = [["Fecha", fechaLarga(c.fecha)], c.contacto?["Para", c.contacto]:null, c.asesor?["Preparado por", c.asesor]:null, venc?["Válida hasta", venc]:null].filter(Boolean);
   B.push({html:`<div class="pd-meta">${meta.map(([k,v])=>`<div><span>${k}</span><b>${esc(v)}</b></div>`).join("")}</div>`});
   if(objetivos.length) B.push({html:`<div class="pd-t">Objetivos</div><ul class="pd-ul">${objetivos.map(o=>`<li>${esc(o)}</li>`).join("")}</ul>`});
+  const ib = infoBlocks();
+  if(ib){ ib.parts.forEach((x,i)=>{ const body = x.p ? `<p class="pd-p">${esc(x.p)}</p>` : `<ul class="pd-ul">${x.ul.map(y=>`<li>${esc(y)}</li>`).join("")}</ul>`;
+    B.push({html: (i===0 ? `<div class="pd-t">${esc(ib.title)}</div>` : "") + body}) }) }
   const rows = r.lines.map(l=>[l.name + (l.qty>1?` · ${l.qty} × ${fmt(l.unitPrice)}`:""), l.freq==="mensual"?"Mensual":"Pago único", fmt(l.total)]);
   if(r.pauta1 || r.pautaFee){
     rows.push(["Gestión de pauta · mes 1 (configuración)" + (S.pauta.redes.length?` · ${redesTxt()}`:""), "Mes 1", fmt(r.pauta1)]);
@@ -1466,6 +1495,17 @@ async function buildPPT(){
       s.addText(String(i+1).padStart(2,"0"),{x:0.95,y:y+0.14,w:0.5,h:0.5,align:"center",valign:"middle",fontFace:F,fontSize:12,bold:true,color:WHITE});
       s.addText(o,{x:1.7,y,w:10.7,h:0.78,valign:"middle",fontFace:F,fontSize:15,color:BLACK});
     });
+  }
+
+  /* 2b. Información importante */
+  const ib = infoBlocks();
+  if(ib){
+    s = pptx.addSlide(); header(s, ib.title, "Información importante");
+    const runs = [];
+    ib.parts.forEach(x=>{ if(x.p) runs.push({text:x.p, options:{breakLine:true, paraSpaceAfter:8}});
+      else x.ul.forEach(y=>runs.push({text:y, options:{bullet:{indent:14}, breakLine:true, paraSpaceAfter:4}})) });
+    s.addShape(pptx.ShapeType.roundRect,{x:0.7,y:1.9,w:11.9,h:4.9,fill:{color:WHITE},line:{color:LINE},rectRadius:0.12});
+    s.addText(runs,{x:1.05,y:2.15,w:11.2,h:4.4,fontFace:F,fontSize:ib.lines.join(" ").length>900?12:15,color:BLACK,valign:"top",fit:"shrink"});
   }
 
   /* 3. Servicios (3 por lámina) */
