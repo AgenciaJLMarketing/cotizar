@@ -547,12 +547,12 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
             <div><span class="lbl">Timbre de prensa (<span id="sTimPct">0.05</span>%)</span><span id="sTim">Q0</span></div>
           </div>
           <div class="big num">
-            <div class="lbl">Inversión primer mes</div>
+            <div class="lbl" id="sTotalLbl">Inversión primer mes</div>
             <div class="val" id="sTotal">Q0</div>
             <div class="sub" id="sTotalSub">Incluye IVA</div>
           </div>
           <div class="contract num" id="sContractRow">
-            <span>Mes 2 en adelante: <b id="sRecurrente">Q0</b>/mes</span>
+            <span id="sRecWrap">Mes 2 en adelante: <b id="sRecurrente">Q0</b>/mes</span>
           </div>
           <div class="field" style="margin-top:12px">
             <label for="fMeses" style="color:#A9B0C2">Duración del contrato</label>
@@ -597,7 +597,7 @@ table.inv tfoot tr.total td:last-child{border-radius:0 10px 10px 0;color:#5DEBD3
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="mbar" id="mbar" aria-label="Total de la cotización">
-  <div><span>Inversión primer mes</span><b class="num" id="mTotal">Q0</b><small id="mSub"></small></div>
+  <div><span id="mLbl">Inversión primer mes</span><b class="num" id="mTotal">Q0</b><small id="mSub"></small></div>
   <button class="btn primary" id="mGo" type="button">Ver resumen</button>
 </div>
 
@@ -841,7 +841,8 @@ function calc(){
   const fee1 = sum(lines,"totalFee") + pautaGain1 + admin;
   return {lines, m, u, mensual, unico, admin, adminMonthly, pautaMonto, pautaFee, pautaCost, pautaGain, pauta1, iva, meses,
     base1, iva1: base1*iva, tim1: base1*tim, total1: base1*mult, indef,
-    rec: baseRec*mult, contrato: indef ? null : baseContrato*mult, prov1, fee1};
+    rec: baseRec*mult, contrato: indef ? null : baseContrato*mult, prov1, fee1,
+    solo: mensual > 0 && Math.abs(base1 - baseRec) < 0.005};
 }
 
 /* ============ RENDER: CATEGORÍAS + CATÁLOGO ============ */
@@ -965,6 +966,8 @@ function renderSummary(){
   $("mSub").textContent = r.lines.length ? `${r.lines.length + (r.pautaFee?1:0)} servicio${r.lines.length + (r.pautaFee?1:0)===1?"":"s"} · con impuestos` : "Elige servicios";
   $("sTotalSub").textContent = `Servicios${r.admin?" + administrativos":""} + IVA ${S.cfg.iva}% + timbre ${S.cfg.timbre}%`;
   $("sRecurrente").textContent = fmt(r.rec);
+  $("sTotalLbl").textContent = "Inversión " + P1(r); $("mLbl").textContent = "Inversión " + P1(r);
+  $("sRecWrap").hidden = r.solo;
   $("sContrato").textContent = r.indef ? `${fmt(r.rec)}/mes` : fmt(r.contrato);
   $("sContratoLbl").textContent = r.indef ? "Plazo indefinido, cada mes" : "Total del contrato con impuestos";
   $("sContractRow").hidden = r.mensual===0;
@@ -1036,11 +1039,11 @@ function renderPaper(r){
           <thead><tr><th>Servicio</th><th>Tipo de pago</th><th class="r">Inversión</th></tr></thead>
           <tbody>${rows.join("") || `<tr><td colspan="3" style="color:#5B6275">Sin servicios</td></tr>`}</tbody>
           <tfoot>
-            <tr><td colspan="2">Subtotal primer mes</td><td class="r num">${fmt(r.base1)}</td></tr>
+            <tr><td colspan="2">Subtotal ${P1(r)}</td><td class="r num">${fmt(r.base1)}</td></tr>
             <tr><td colspan="2">IVA ${S.cfg.iva}%</td><td class="r num">${fmt(r.iva1)}</td></tr>
             <tr><td colspan="2">Timbre de prensa ${S.cfg.timbre}%</td><td class="r num">${fmtc(r.tim1)}</td></tr>
-            <tr class="total"><td colspan="2">Inversión primer mes</td><td class="r num">${fmt(r.total1)}</td></tr>
-            ${r.mensual?`<tr><td colspan="2">Mes 2 en adelante (con impuestos)</td><td class="r num"><b>${fmt(r.rec)}/mes</b></td></tr>
+            <tr class="total"><td colspan="2">Inversión ${P1(r)}${r.solo?" (con impuestos)":""}</td><td class="r num">${fmt(r.total1)}</td></tr>
+            ${r.mensual?`${r.solo?"":`<tr><td colspan="2">Mes 2 en adelante (con impuestos)</td><td class="r num"><b>${fmt(r.rec)}/mes</b></td></tr>`}
             <tr><td colspan="2">Vigencia del contrato</td><td class="r num"><b>${vigenciaTxt(r)}</b></td></tr>`:""}
           </tfoot>
         </table></div>
@@ -1287,8 +1290,8 @@ function summaryText(){
   r.lines.forEach(l=>L.push(`• ${l.name}${l.qty>1?` (${l.qty} ${l.it.unit})`:""}: ${fmt(l.total)}${l.freq==="mensual"?" /mes":" pago único"}`));
   if(r.pauta1 || r.pautaFee) L.push(`• Gestión de pauta: mes 1 ${fmt(r.pauta1)} · mes 2 en adelante ${fmt(r.pautaFee)} /mes`);
   if(r.admin) L.push(`• Costos administrativos: ${fmt(r.admin)}`);
-  L.push("", `Subtotal primer mes: ${fmt(r.base1)}`, `IVA ${S.cfg.iva}%: ${fmt(r.iva1)}`, `Timbre de prensa ${S.cfg.timbre}%: ${fmtc(r.tim1)}`, `Inversión primer mes: ${fmt(r.total1)}`);
-  if(r.mensual) L.push(`Mes 2 en adelante: ${fmt(r.rec)} /mes`, `Vigencia del contrato: ${vigenciaTxt(r)}`);
+  L.push("", `Subtotal ${P1(r)}: ${fmt(r.base1)}`, `IVA ${S.cfg.iva}%: ${fmt(r.iva1)}`, `Timbre de prensa ${S.cfg.timbre}%: ${fmtc(r.tim1)}`, `Inversión ${P1(r)}: ${fmt(r.total1)}${r.solo?" /mes":""}`);
+  if(r.mensual) L.push(...(r.solo?[]:[`Mes 2 en adelante: ${fmt(r.rec)} /mes`]), `Vigencia del contrato: ${vigenciaTxt(r)}`);
   if(r.pautaMonto) L.push("", `Pauta (aparte, pagada directo a plataformas): ${fmt(r.pautaMonto)} /mes`);
   L.push("", curNote());
   if(c.pago) L.push(`Condiciones de pago: ${c.pago}`);
@@ -1324,6 +1327,7 @@ function loadJs(src, test){
   if(test()) return Promise.resolve();
   return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s) });
 }
+const P1 = r => r.solo ? "mensual" : "primer mes";
 const vigenciaTxt = r => r.indef ? "Indefinida" : `${r.meses} ${r.meses>1?"meses":"mes"}`;
 const PD_COLS = `<colgroup><col style="width:58%"><col style="width:22%"><col style="width:20%"></colgroup>`;
 const PD_THEAD = `<table class="pd-tb">${PD_COLS}<thead><tr><th>Servicio</th><th>Tipo de pago</th><th class="r">Inversión</th></tr></thead></table>`;
@@ -1350,11 +1354,11 @@ function pdfBlocks(r){
   if(!rows.length) rows.push(["Sin servicios","",""]);
   rows.forEach((x,i)=>B.push({kind:"row", tight:true, html: i===0 ? `<div class="pd-t">Inversión</div>${PD_THEAD}${rowHTML(x)}` : rowHTML(x)}));
   B.push({html:`<div class="pd-tot">
-      <div class="pd-tl"><span>Subtotal primer mes</span><b>${fmt(r.base1)}</b></div>
+      <div class="pd-tl"><span>Subtotal ${P1(r)}</span><b>${fmt(r.base1)}</b></div>
       <div class="pd-tl"><span>IVA ${S.cfg.iva}%</span><b>${fmt(r.iva1)}</b></div>
       <div class="pd-tl"><span>Timbre de prensa ${S.cfg.timbre}%</span><b>${fmtc(r.tim1)}</b></div>
-      <div class="pd-big"><span>Inversión primer mes</span><b>${fmt(r.total1)}</b></div>
-      ${r.mensual?`<div class="pd-tl"><span>Mes 2 en adelante (con impuestos)</span><b>${fmt(r.rec)} /mes</b></div>
+      <div class="pd-big"><span>Inversión ${P1(r)}</span><b>${fmt(r.total1)}${r.solo?" /mes":""}</b></div>
+      ${r.mensual?`${r.solo?"":`<div class="pd-tl"><span>Mes 2 en adelante (con impuestos)</span><b>${fmt(r.rec)} /mes</b></div>`}
       <div class="pd-tl"><span>Vigencia del contrato</span><b>${vigenciaTxt(r)}</b></div>`:""}
     </div><p class="pd-note">${curNote()} La producción de videos adicionales a los incluidos en cada plan se cotiza aparte.</p>`});
   if(r.pautaMonto) B.push({html:`<div class="pd-box"><b>Pauta digital:</b> inversión sugerida de <b>${fmt(r.pautaMonto)} al mes</b>${S.pauta.redes.length?` en ${esc(redesTxt())}`:""}. Este monto lo paga ${esc(emp)} directamente a las plataformas y no forma parte de la inversión de agencia.</div>`});
@@ -1535,12 +1539,14 @@ async function buildPPT(){
   s.addTable(rows,{x:0.7,y:1.9,w:7.7,colW:[4.3,1.7,1.7],border:{type:"solid",color:LINE,pt:0.75},rowH:0.42,autoPage:true,autoPageRepeatHeader:true,newSlideStartY:1.9});
   s.addShape(pptx.ShapeType.roundRect,{x:8.75,y:1.9,w:3.88,h:4.85,fill:{color:BLACK},line:{color:BLACK},rectRadius:0.14});
   const kv = (lbl,val,y) => { s.addText(lbl,{x:9.05,y,w:2.0,h:0.32,fontFace:F,fontSize:10.5,color:"A9B0C2"}); s.addText(val,{x:10.6,y,w:1.75,h:0.32,fontFace:F,fontSize:10.5,color:WHITE,align:"right"}) };
-  kv("Subtotal primer mes",fmt(r.base1),2.15); kv(`IVA ${S.cfg.iva}%`,fmt(r.iva1),2.5); kv(`Timbre de prensa ${S.cfg.timbre}%`,fmtc(r.tim1),2.85);
-  s.addText("INVERSIÓN PRIMER MES",{x:9.05,y:3.4,w:3.3,h:0.3,fontFace:F,fontSize:9.5,bold:true,color:MINT,charSpacing:2});
-  s.addText(fmt(r.total1),{x:9.05,y:3.7,w:3.3,h:0.7,fontFace:F,fontSize:30,bold:true,color:WHITE});
+  kv("Subtotal "+P1(r),fmt(r.base1),2.15); kv(`IVA ${S.cfg.iva}%`,fmt(r.iva1),2.5); kv(`Timbre de prensa ${S.cfg.timbre}%`,fmtc(r.tim1),2.85);
+  s.addText("INVERSIÓN "+P1(r).toUpperCase(),{x:9.05,y:3.4,w:3.3,h:0.3,fontFace:F,fontSize:9.5,bold:true,color:MINT,charSpacing:2});
+  s.addText(fmt(r.total1)+(r.solo?" /mes":""),{x:9.05,y:3.7,w:3.3,h:0.7,fontFace:F,fontSize:30,bold:true,color:WHITE});
   if(r.mensual){
+    if(!r.solo){
     s.addText("Mes 2 en adelante",{x:9.05,y:4.6,w:3.3,h:0.3,fontFace:F,fontSize:10.5,color:"A9B0C2"});
     s.addText(`${fmt(r.rec)} /mes`,{x:9.05,y:4.9,w:3.3,h:0.4,fontFace:F,fontSize:17,bold:true,color:MINT});
+    }
     s.addText(`Vigencia del contrato: ${vigenciaTxt(r)}`,{x:9.05,y:5.45,w:3.3,h:0.5,fontFace:F,fontSize:10.5,color:WHITE});
   }
   s.addText("Montos con impuestos incluidos",{x:9.05,y:6.2,w:3.3,h:0.3,fontFace:F,fontSize:9,color:"A9B0C2"});
